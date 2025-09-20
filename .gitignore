@@ -1,0 +1,17 @@
+# Node
+node_modules/
+dist/
+.env
+pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
