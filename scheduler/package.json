@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "description": "Background job runner for Pulse (streaks, badge awards, plan refresh).",
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
   "main": "dist/index.js",
   "files": [
