@@ -66,7 +66,7 @@ scripts/             # Helper scripts (dev, seed)
 ### Development
 **Prerequisites**
 
-Node.js 20+
+Node.js 18+
 
 pnpm 9+
 
