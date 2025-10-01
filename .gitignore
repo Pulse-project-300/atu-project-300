@@ -7,11 +7,12 @@ pnpm-lock.yaml
 # Python
 __pycache__/
 *.pyc
-venv/
+.venv/
 
 # Logs
 *.log
 
 # OS
 .DS_Store
-Thumbs.db
+Thumbs.db.venv/
+.venv/
