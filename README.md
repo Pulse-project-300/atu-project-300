@@ -88,14 +88,14 @@ pnpm install
 Start with Ai orcherstrator 
 ```bash
 cd services/ai-orchestrator
-. .venv/bin/activate
+source .venv/bin/activate
 uvicorn app.main:app --reload --port 8001
 ```
-**Start the API**
+**Start the API** (from root)
 ```bash
 pnpm --filter api dev
 ```
-**Start the web app**
+**Start the web app** (from root)
 ```bash
 pnpm --filter web dev
 ```
