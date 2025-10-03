@@ -12,11 +12,11 @@ export default async function Home() {
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 flex flex-col items-center justify-center max-w-4xl px-5 text-center gap-8">
         <h1 className="text-4xl md:text-6xl font-bold">
-          Your AI-Powered Fitness Companion
+          Your Fitness. Personalised. Evolving
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl">
-          Get personalized workout plans that adapt to your goals, progress, and
-          lifestyle.
+          Custom workout plans powered by AI — evolving with your goals,
+          progress, and lifestyle.
         </p>
         <div className="flex gap-4">
           {user ? (
