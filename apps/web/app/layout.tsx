@@ -9,8 +9,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Pulse - AI-Powered Fitness App",
-  description: "Get personalized workout plans that adapt to your goals, progress, and lifestyle.",
+  title: "Pulse",
+  description:
+    "Get personalized workout plans that adapt to your goals, progress, and lifestyle.",
 };
 
 const geistSans = Geist({
