@@ -9,17 +9,11 @@ __pycache__/
 *.pyc
 .venv/
 
+
 # Logs
 *.log
 
 # OS
 .DS_Store
-Thumbs.db.venv/
-.venv/
+Thumbs.db
 
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
