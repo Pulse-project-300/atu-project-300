@@ -13,4 +13,16 @@ test.describe("Landing Page", () => {
     await expect(page).toHaveTitle(/Pulse/i);
     await expect(page.getByRole("link", { name: "Pulse" })).toBeVisible();
   });
+
+  test("should navigate to login page when Sign In is clicked", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // Click the Sign In link
+    await page.getByRole("link", { name: "Sign in" }).click();
+
+    // Verify navigation to login page
+    await expect(page).toHaveURL(/\/login/);
+  });
 });
