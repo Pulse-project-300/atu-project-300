@@ -7,14 +7,20 @@
     "dev": "pnpm -r --parallel --filter \"./apps/*\" run dev",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
   },
   "devDependencies": {
-    "typescript": "^5.6.3",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.7.0",
     "eslint": "^9.12.0",
     "prettier": "^3.3.3",
     "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
     "zod": "^3.23.8"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
   }
 }
-
