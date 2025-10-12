@@ -10,13 +10,12 @@ export function ProgressIndicator({ currentStep, totalSteps }: ProgressIndicator
 
   return (
     <div className="w-full space-y-2">
-      <div className="flex justify-between text-sm text-muted-foreground">
-        <span>Step {currentStep} of {totalSteps}</span>
-        <span>{Math.round(progress)}%</span>
+      <div className="text-sm text-muted-foreground">
+        Step {currentStep} of {totalSteps}
       </div>
-      <div className="h-2 bg-secondary rounded-full overflow-hidden">
+      <div className="h-1 bg-border rounded-full overflow-hidden">
         <div
-          className="h-full bg-primary transition-all duration-300 ease-in-out"
+          className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>

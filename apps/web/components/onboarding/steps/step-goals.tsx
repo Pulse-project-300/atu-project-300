@@ -2,7 +2,6 @@
 
 import { OnboardingData } from "@/lib/onboarding/types";
 import { FITNESS_GOALS } from "@/lib/onboarding/constants";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface StepGoalsProps {
   data: OnboardingData;
@@ -11,31 +10,41 @@ interface StepGoalsProps {
 
 export function StepGoals({ data, onChange }: StepGoalsProps) {
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold">What's your primary goal?</h2>
+    <div className="space-y-8 py-12">
+      <div className="space-y-4">
+        <h2 className="text-3xl font-light text-foreground">What's your goal?</h2>
         <p className="text-muted-foreground">
-          We'll design your workouts around this objective
+          Choose your primary fitness objective
         </p>
       </div>
 
-      <div className="grid gap-4 max-w-2xl mx-auto">
-        {FITNESS_GOALS.map((goal) => (
-          <Card
-            key={goal.value}
-            className={`cursor-pointer transition-all ${
-              data.fitnessGoal === goal.value
-                ? "border-primary bg-primary/5"
-                : "hover:border-primary/50"
-            }`}
-            onClick={() => onChange({ fitnessGoal: goal.value })}
-          >
-            <CardHeader>
-              <CardTitle className="text-lg">{goal.label}</CardTitle>
-              <CardDescription>{goal.description}</CardDescription>
-            </CardHeader>
-          </Card>
-        ))}
+      <div className="space-y-3">
+        {FITNESS_GOALS.map((goal) => {
+          const isSelected = data.fitnessGoal === goal.value;
+          return (
+            <button
+              key={goal.value}
+              onClick={() => onChange({ fitnessGoal: goal.value })}
+              className={`w-full text-left transition-all relative ${
+                isSelected
+                  ? "p-4 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                  : "inline-flex p-0.5 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500"
+              }`}
+            >
+              {isSelected ? (
+                <>
+                  <div className="font-medium">{goal.label}</div>
+                  <div className="text-sm mt-1 text-white/90">{goal.description}</div>
+                </>
+              ) : (
+                <div className="w-full p-4 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:text-white">
+                  <div className="font-medium text-foreground group-hover:text-white">{goal.label}</div>
+                  <div className="text-sm text-muted-foreground group-hover:text-white/90 mt-1">{goal.description}</div>
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -4,10 +4,14 @@ import { useOnboarding } from "@/hooks/use-onboarding";
 import { ProgressIndicator } from "./progress-indicator";
 import { NavigationButtons } from "./navigation-buttons";
 import { StepWelcome } from "./steps/step-welcome";
-import { StepBasics } from "./steps/step-basics";
+import { StepAge } from "./steps/step-age";
+import { StepGender } from "./steps/step-gender";
+import { StepHeight } from "./steps/step-height";
+import { StepWeight } from "./steps/step-weight";
 import { StepGoals } from "./steps/step-goals";
 import { StepExperience } from "./steps/step-experience";
-import { StepSchedule } from "./steps/step-schedule";
+import { StepDays } from "./steps/step-days";
+import { StepTime } from "./steps/step-time";
 import { StepEquipment } from "./steps/step-equipment";
 import { StepPreferences } from "./steps/step-preferences";
 import { TOTAL_STEPS } from "@/lib/onboarding/constants";
@@ -23,17 +27,25 @@ export function OnboardingContainer() {
     switch (currentStep) {
       case 1: // Welcome
         return true;
-      case 2: // Basics
-        return !!(data.age && data.gender && data.heightCm && data.weightKg);
-      case 3: // Goals
+      case 2: // Age
+        return !!data.age;
+      case 3: // Gender
+        return !!data.gender;
+      case 4: // Height
+        return !!data.heightCm;
+      case 5: // Weight
+        return !!data.weightKg;
+      case 6: // Goals
         return !!data.fitnessGoal;
-      case 4: // Experience
+      case 7: // Experience
         return !!data.experienceLevel;
-      case 5: // Schedule
-        return !!(data.daysPerWeek && data.preferredWorkoutTime);
-      case 6: // Equipment
+      case 8: // Days per week
+        return !!data.daysPerWeek;
+      case 9: // Preferred time
+        return !!data.preferredWorkoutTime;
+      case 10: // Equipment
         return !!data.equipmentAccess && data.equipmentAccess.length > 0;
-      case 7: // Preferences
+      case 11: // Preferences
         return true; // Optional step
       default:
         return false;
@@ -73,16 +85,24 @@ export function OnboardingContainer() {
       case 1:
         return <StepWelcome />;
       case 2:
-        return <StepBasics data={data} onChange={updateData} />;
+        return <StepAge data={data} onChange={updateData} />;
       case 3:
-        return <StepGoals data={data} onChange={updateData} />;
+        return <StepGender data={data} onChange={updateData} />;
       case 4:
-        return <StepExperience data={data} onChange={updateData} />;
+        return <StepHeight data={data} onChange={updateData} />;
       case 5:
-        return <StepSchedule data={data} onChange={updateData} />;
+        return <StepWeight data={data} onChange={updateData} />;
       case 6:
-        return <StepEquipment data={data} onChange={updateData} />;
+        return <StepGoals data={data} onChange={updateData} />;
       case 7:
+        return <StepExperience data={data} onChange={updateData} />;
+      case 8:
+        return <StepDays data={data} onChange={updateData} />;
+      case 9:
+        return <StepTime data={data} onChange={updateData} />;
+      case 10:
+        return <StepEquipment data={data} onChange={updateData} />;
+      case 11:
         return <StepPreferences data={data} onChange={updateData} />;
       default:
         return null;
@@ -90,11 +110,11 @@ export function OnboardingContainer() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      <div className="space-y-8">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl space-y-12">
         <ProgressIndicator currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
-        <div className="min-h-[400px] flex items-center justify-center">
+        <div className="min-h-[400px]">
           {renderStep()}
         </div>
 

@@ -96,4 +96,4 @@ export const WORKOUT_TIME_OPTIONS = [
   { value: "flexible", label: "Flexible" },
 ];
 
-export const TOTAL_STEPS = 7;
+export const TOTAL_STEPS = 11;

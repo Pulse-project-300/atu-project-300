@@ -2,7 +2,6 @@
 
 import { OnboardingData } from "@/lib/onboarding/types";
 import { EXPERIENCE_LEVELS } from "@/lib/onboarding/constants";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface StepExperienceProps {
   data: OnboardingData;
@@ -11,31 +10,41 @@ interface StepExperienceProps {
 
 export function StepExperience({ data, onChange }: StepExperienceProps) {
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold">What's your experience level?</h2>
+    <div className="space-y-8 py-12">
+      <div className="space-y-4">
+        <h2 className="text-3xl font-light text-foreground">Your experience level</h2>
         <p className="text-muted-foreground">
-          This helps us set appropriate intensity and progression
+          Help us tailor the intensity
         </p>
       </div>
 
-      <div className="grid gap-4 max-w-2xl mx-auto">
-        {EXPERIENCE_LEVELS.map((level) => (
-          <Card
-            key={level.value}
-            className={`cursor-pointer transition-all ${
-              data.experienceLevel === level.value
-                ? "border-primary bg-primary/5"
-                : "hover:border-primary/50"
-            }`}
-            onClick={() => onChange({ experienceLevel: level.value })}
-          >
-            <CardHeader>
-              <CardTitle className="text-lg">{level.label}</CardTitle>
-              <CardDescription>{level.description}</CardDescription>
-            </CardHeader>
-          </Card>
-        ))}
+      <div className="space-y-3">
+        {EXPERIENCE_LEVELS.map((level) => {
+          const isSelected = data.experienceLevel === level.value;
+          return (
+            <button
+              key={level.value}
+              onClick={() => onChange({ experienceLevel: level.value })}
+              className={`w-full text-left transition-all relative ${
+                isSelected
+                  ? "p-4 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                  : "inline-flex p-0.5 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500"
+              }`}
+            >
+              {isSelected ? (
+                <>
+                  <div className="font-medium">{level.label}</div>
+                  <div className="text-sm mt-1 text-white/90">{level.description}</div>
+                </>
+              ) : (
+                <div className="w-full p-4 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:text-white">
+                  <div className="font-medium text-foreground group-hover:text-white">{level.label}</div>
+                  <div className="text-sm text-muted-foreground group-hover:text-white/90 mt-1">{level.description}</div>
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

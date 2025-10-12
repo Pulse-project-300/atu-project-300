@@ -2,30 +2,15 @@
 
 export function StepWelcome() {
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold">Welcome to Pulse! 💪</h2>
-        <p className="text-muted-foreground text-lg">
-          Let's create your personalized fitness journey
+    <div className="space-y-8 py-12 text-center">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-medium tracking-tight">Pulse</h1>
+          <div className="mx-auto mt-2 h-px w-16 bg-gradient-to-r from-purple-500 to-pink-500" />
+        </div>
+        <p className="text-base text-muted-foreground">
+          Let's get your fitness journey started
         </p>
-      </div>
-
-      <div className="space-y-4 max-w-md mx-auto">
-        <div className="p-4 border rounded-lg">
-          <h3 className="font-semibold mb-2">✨ What to expect</h3>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• AI-powered workout plans tailored to you</li>
-            <li>• Track your progress and achievements</li>
-            <li>• Adaptive training that evolves with you</li>
-          </ul>
-        </div>
-
-        <div className="p-4 border rounded-lg">
-          <h3 className="font-semibold mb-2">⏱️ This will take 2-3 minutes</h3>
-          <p className="text-sm text-muted-foreground">
-            We'll ask about your goals, experience, and preferences to create the perfect plan
-          </p>
-        </div>
       </div>
     </div>
   );
