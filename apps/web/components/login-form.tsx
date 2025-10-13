@@ -69,15 +69,15 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card data-testid="login-card">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl" data-testid="login-title">Login</CardTitle>
+          <CardDescription data-testid="login-description">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleLogin} data-testid="login-form">
             <div className="flex flex-col gap-6">
               <Button
                 type="button"
@@ -85,6 +85,7 @@ export function LoginForm({
                 className="w-full"
                 onClick={handleGoogleLogin}
                 disabled={isGoogleLoading || isLoading}
+                data-testid="google-login-button"
               >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path
@@ -127,6 +128,7 @@ export function LoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  data-testid="email-input"
                 />
               </div>
               <div className="grid gap-2">
@@ -135,6 +137,7 @@ export function LoginForm({
                   <Link
                     href="/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    data-testid="forgot-password-link"
                   >
                     Forgot your password?
                   </Link>
@@ -145,13 +148,15 @@ export function LoginForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  data-testid="password-input"
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-red-500" data-testid="login-error">{error}</p>}
               <Button
                 type="submit"
                 className="w-full"
                 disabled={isLoading || isGoogleLoading}
+                data-testid="login-submit-button"
               >
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
@@ -161,6 +166,7 @@ export function LoginForm({
               <Link
                 href="/sign-up"
                 className="underline underline-offset-4"
+                data-testid="sign-up-link"
               >
                 Sign up
               </Link>
