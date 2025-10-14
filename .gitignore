@@ -3,8 +3,7 @@ node_modules/
 dist/
 .env
 pnpm-lock.yaml
-.env.local
-.env
+
 
 # Python
 __pycache__/
