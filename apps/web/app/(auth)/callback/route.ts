@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get("next") ?? "/dashboard";
+  let next = searchParams.get("next") ?? "/dashboard";
 
   if (code) {
     const supabase = await createClient();
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         // Check if profile exists
         const { data: existingProfile } = await supabase
           .from("profiles")
-          .select("id")
+          .select("id, onboarding_completed_at")
           .eq("id", user.id)
           .single();
 
@@ -39,6 +39,12 @@ export async function GET(request: Request) {
             name: name,
             created_at: new Date().toISOString(),
           });
+
+          // New user - redirect to onboarding
+          next = "/onboarding";
+        } else if (!existingProfile.onboarding_completed_at) {
+          // Existing user but hasn't completed onboarding
+          next = "/onboarding";
         }
       }
 
