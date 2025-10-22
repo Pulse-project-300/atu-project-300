@@ -19,8 +19,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export function OnboardingContainer() {
-  const { data, currentStep, updateData, nextStep, previousStep } = useOnboarding();
+  const { data, currentStep, updateData, nextStep, previousStep } =
+    useOnboarding();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [status, setStatus] = useState("");
   const router = useRouter();
 
   const canProceed = () => {
@@ -56,20 +58,19 @@ export function OnboardingContainer() {
     if (currentStep === TOTAL_STEPS) {
       // Final step - generate plan
       setIsGenerating(true);
+      setStatus("Generating...");
       try {
-        // TODO: Call API to save profile and generate plan
-        const response = await fetch("/api/plans/generate", {
+        const res = await fetch("/api/plans/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: "current-user", // TODO: Get from auth
-            profile: data,
+            userId: "demo-user",
+            profile: { goal: "muscle gain", experience: "beginner" },
           }),
         });
 
-        if (response.ok) {
-          router.push("/dashboard");
-        }
+        const data = await res.json();
+        setStatus(JSON.stringify(data, null, 2));
       } catch (error) {
         console.error("Error generating plan:", error);
       } finally {
@@ -114,9 +115,7 @@ export function OnboardingContainer() {
       <div className="w-full max-w-2xl space-y-12">
         <ProgressIndicator currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
-        <div className="min-h-[400px]">
-          {renderStep()}
-        </div>
+        <div className="min-h-[400px]">{renderStep()}</div>
 
         <NavigationButtons
           currentStep={currentStep}
@@ -126,6 +125,15 @@ export function OnboardingContainer() {
           canProceed={canProceed()}
           isGenerating={isGenerating}
         />
+
+        {status && (
+          <div className="mt-8 p-4 bg-muted rounded-lg border">
+            <h3 className="text-sm font-semibold mb-2">API Response:</h3>
+            <pre className="text-xs overflow-auto max-h-64 whitespace-pre-wrap">
+              {status}
+            </pre>
+          </div>
+        )}
       </div>
     </div>
   );
