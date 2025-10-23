@@ -28,10 +28,24 @@ jobs:
     - name: Create environment files
       run: |
         # Create root .env.local for Playwright config
-        cat > .env.local << EOF
-        TEST_USER_EMAIL=${{ secrets.TEST_USER_EMAIL }}
-        TEST_USER_PASSWORD=${{ secrets.TEST_USER_PASSWORD }}
-        EOF
+        cat > .env.local << 'EOF'
+TEST_USER_EMAIL=${{ secrets.TEST_USER_EMAIL }}
+TEST_USER_PASSWORD=${{ secrets.TEST_USER_PASSWORD }}
+EOF
+
+        # Create apps/web/.env.local for Next.js app
+        cat > apps/web/.env.local << 'EOF'
+NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+EOF
+    - name: Run Playwright tests
+      run: pnpm exec playwright test tests/end2end/login.spec.ts
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
 
         # Create apps/web/.env.local for Next.js app
         cat > apps/web/.env.local << EOF
