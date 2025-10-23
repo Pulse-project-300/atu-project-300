@@ -1,7 +1,32 @@
+
 import { createClient } from "@/lib/supabase/server";
+//import { useState } from 'react';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
+  // State to hold generation status
+  //const [status, setStatus] = useState('');
+/*
+  // Function to handle plan generation
+  async function handleGenerate() {
+    setStatus('Generating...');
+    try {
+      const res = await fetch('/api/plans/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'demo-user',
+          profile: { goal: 'muscle gain', experience: 'beginner' }
+        }),
+      });
+
+      const data = await res.json();
+      setStatus(JSON.stringify(data, null, 2));
+    } catch (err: any) {
+      setStatus(err.message);
+    }
+  }
+*/
 
   const {
     data: { user },
@@ -45,6 +70,8 @@ export default async function DashboardPage() {
           </p>
         </div>
       </div>
+    
+
     </div>
   );
 }

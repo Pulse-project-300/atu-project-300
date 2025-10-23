@@ -30,13 +30,6 @@ jobs:
         NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
         NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
         EOF
-    - name: Verify environment files
-      run: |
-        echo "Checking .env.local files exist..."
-        ls -la .env.local
-        ls -la apps/web/.env.local
-        echo "Root .env.local has $(wc -l < .env.local) lines"
-        echo "Web .env.local has $(wc -l < apps/web/.env.local) lines"
     - name: Run Playwright tests
       run: pnpm exec playwright test
     - uses: actions/upload-artifact@v4
