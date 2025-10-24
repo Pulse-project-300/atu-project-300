@@ -2,7 +2,7 @@ name: Playwright Tests
 on:
   push:
     branches:
-      - 'feature/**'
+      - main
   pull_request:
     branches:
       - main
@@ -38,24 +38,6 @@ jobs:
         # Create apps/web/.env.local for Next.js app
         echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > apps/web/.env.local
         echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> apps/web/.env.local
-    - name: Debug environment files
-      run: |
-        echo "=== Checking if files exist ==="
-        ls -la .env.local
-        ls -la apps/web/.env.local
-
-        echo ""
-        echo "=== Root .env.local contents ==="
-        cat .env.local
-
-        echo ""
-        echo "=== apps/web/.env.local contents ==="
-        cat apps/web/.env.local
-
-        echo ""
-        echo "=== Checking secret lengths (via file content) ==="
-        grep "NEXT_PUBLIC_SUPABASE_URL=" apps/web/.env.local | wc -c
-        grep "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=" apps/web/.env.local | wc -c
     - name: Run Playwright tests
       run: pnpm exec playwright test tests/end2end/login.spec.ts
     - uses: actions/upload-artifact@v4
