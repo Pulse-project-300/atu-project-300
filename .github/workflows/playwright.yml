@@ -38,6 +38,35 @@ jobs:
         # Create apps/web/.env.local for Next.js app
         echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > apps/web/.env.local
         echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> apps/web/.env.local
+    - name: Debug environment files
+      run: |
+        echo "=== Checking if files exist ==="
+        ls -la .env.local
+        ls -la apps/web/.env.local
+
+        echo ""
+        echo "=== Root .env.local contents (length check) ==="
+        wc -l .env.local
+        head -c 100 .env.local
+
+        echo ""
+        echo "=== apps/web/.env.local contents (length check) ==="
+        wc -l apps/web/.env.local
+        head -c 100 apps/web/.env.local
+
+        echo ""
+        echo "=== Checking if secrets are empty ==="
+        if [ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+          echo "ERROR: NEXT_PUBLIC_SUPABASE_URL secret is empty!"
+        else
+          echo "NEXT_PUBLIC_SUPABASE_URL is set (length: ${#NEXT_PUBLIC_SUPABASE_URL})"
+        fi
+
+        if [ -z "${{ secrets.SUPABASE_ANON_KEY }}" ]; then
+          echo "ERROR: SUPABASE_ANON_KEY secret is empty!"
+        else
+          echo "SUPABASE_ANON_KEY is set"
+        fi
     - name: Run Playwright tests
       run: pnpm exec playwright test tests/end2end/login.spec.ts
     - uses: actions/upload-artifact@v4
