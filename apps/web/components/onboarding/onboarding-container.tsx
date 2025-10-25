@@ -50,10 +50,22 @@ export function OnboardingContainer() {
 
   const handleNext = async () => {
     if (currentStep === TOTAL_STEPS) {
-      // Final step - generate plan
+      // Final step - save profile and generate plan
       setIsGenerating(true);
-      setStatus("Generating...");
+      setStatus("Saving profile...");
+
       try {
+        // Step 1: Save profile to Supabase
+        const saveResult = await saveOnboardingProfile(data);
+
+        if (saveResult.error) {
+          setStatus(`Error saving profile: ${saveResult.error}`);
+          console.error("Error saving profile:", saveResult.error);
+          return;
+        }
+
+        // Step 2: Generate workout plan
+        setStatus("Generating your personalized workout plan...");
         const res = await fetch("/api/plans/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -72,9 +84,15 @@ export function OnboardingContainer() {
         });
 
         const responseData = await res.json();
-        setStatus(JSON.stringify(responseData, null, 2));
+        setStatus("Success! Profile saved and plan generated.\n\n" + JSON.stringify(responseData, null, 2));
+
+        // Optional: Redirect to dashboard after success
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
+
       } catch (error) {
-        console.error("Error generating plan:", error);
+        console.error("Error during onboarding:", error);
         setStatus("Error: " + (error as Error).message);
       } finally {
         setIsGenerating(false);
@@ -106,9 +124,11 @@ export function OnboardingContainer() {
         return (
           <div className="space-y-8 py-12">
             <div className="space-y-4">
-              <h2 className="text-3xl font-light text-foreground">Ready to start?</h2>
+              <h2 className="text-3xl font-light text-foreground">
+                Ready to start?
+              </h2>
               <p className="text-muted-foreground">
-                Click finish to generate your personalized workout plan
+                Click finish to generate your personalised workout plan
               </p>
             </div>
           </div>
