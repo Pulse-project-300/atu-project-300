@@ -10,11 +10,11 @@ interface StepEquipmentProps {
 
 export function StepEquipment({ data, onChange }: StepEquipmentProps) {
   const handleToggle = (value: string) => {
-    const current = data.equipmentAccess || [];
+    const current = data.equipment || [];
     const updated = current.includes(value as any)
       ? current.filter((item) => item !== value)
       : [...current, value as any];
-    onChange({ equipmentAccess: updated });
+    onChange({ equipment: updated });
   };
 
   return (
@@ -28,7 +28,7 @@ export function StepEquipment({ data, onChange }: StepEquipmentProps) {
 
       <div className="space-y-3">
         {EQUIPMENT_OPTIONS.map((equipment) => {
-          const isSelected = data.equipmentAccess?.includes(equipment.value);
+          const isSelected = data.equipment?.includes(equipment.value);
           return (
             <button
               key={equipment.value}

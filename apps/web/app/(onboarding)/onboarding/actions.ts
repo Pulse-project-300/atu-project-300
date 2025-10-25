@@ -18,21 +18,16 @@ export async function saveOnboardingProfile(data: OnboardingData) {
   const { error } = await supabase
     .from("profiles")
     .update({
-      age: data.age,
+      dob: data.dob,
       gender: data.gender,
       height_cm: data.heightCm,
       weight_kg: data.weightKg,
       fitness_goal: data.fitnessGoal,
       experience_level: data.experienceLevel,
-      days_per_week: data.daysPerWeek,
-      preferred_workout_time: data.preferredWorkoutTime,
-      equipment_access: data.equipmentAccess,
-      injuries: data.injuries,
-      preferences: data.preferences,
-      onboarding_completed_at: new Date().toISOString(),
+      equipment: data.equipment,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", user.id);
+    .eq("user_id", user.id);
 
   if (error) {
     console.error("Error saving profile:", error);

@@ -10,8 +10,8 @@ import { OnboardingData } from "@/lib/onboarding/types";
  * including user data collection and step navigation.
  *
  * @returns {Object} Onboarding state and control functions
- * @returns {OnboardingData} data - The collected user data (age, gender, fitness goals, etc.)
- * @returns {number} currentStep - The current step number (1-11)
+ * @returns {OnboardingData} data - The collected user data (dob, gender, fitness goals, etc.)
+ * @returns {number} currentStep - The current step number (1-9)
  * @returns {Function} updateData - Function to update user data
  * @returns {Function} nextStep - Function to advance to the next step
  * @returns {Function} previousStep - Function to go back to the previous step
@@ -20,27 +20,27 @@ import { OnboardingData } from "@/lib/onboarding/types";
  * @example
  * const { data, currentStep, updateData, nextStep } = useOnboarding();
  *
- * // Update user's age
- * updateData({ age: 25 });
+ * // Update user's date of birth
+ * updateData({ dob: "1990-01-01" });
  *
  * // Move to next step
  * nextStep();
  */
 export function useOnboarding() {
-  // Store all the user's onboarding data (age, gender, goals, etc.)
+  // Store all the user's onboarding data (dob, gender, goals, etc.)
   const [data, setData] = useState<OnboardingData>({});
 
-  // Track which step of the onboarding process the user is on (1-11)
+  // Track which step of the onboarding process the user is on (1-9)
   const [currentStep, setCurrentStep] = useState(1);
 
   /**
    * Updates the onboarding data with new values.
    * Merges new data with existing data without overwriting other fields.
    *
-   * @param {Partial<OnboardingData>} newData - The data to merge (e.g., { age: 25 })
+   * @param {Partial<OnboardingData>} newData - The data to merge (e.g., { dob: "1990-01-01" })
    *
    * @example
-   * updateData({ age: 25 }); // Updates only age
+   * updateData({ dob: "1990-01-01" }); // Updates date of birth
    * updateData({ gender: "male", heightCm: 180 }); // Updates multiple fields
    */
   const updateData = useCallback((newData: Partial<OnboardingData>) => {

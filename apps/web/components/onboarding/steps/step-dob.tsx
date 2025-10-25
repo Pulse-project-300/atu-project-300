@@ -1,29 +1,27 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { OnboardingData } from "@/lib/onboarding/types";
 
-interface StepAgeProps {
+interface StepDobProps {
   data: OnboardingData;
   onChange: (data: Partial<OnboardingData>) => void;
 }
 
-export function StepAge({ data, onChange }: StepAgeProps) {
+export function StepDob({ data, onChange }: StepDobProps) {
   return (
     <div className="space-y-8 py-12">
       <div className="space-y-4">
-        <h2 className="text-3xl font-light text-foreground">How old are you?</h2>
+        <h2 className="text-3xl font-light text-foreground">What's your date of birth?</h2>
       </div>
 
       <div className="max-w-xs">
         <Input
-          id="age"
-          type="number"
-          placeholder="25"
+          id="dob"
+          type="date"
           className="text-lg h-12"
-          value={data.age || ""}
-          onChange={(e) => onChange({ age: parseInt(e.target.value) })}
+          value={data.dob || ""}
+          onChange={(e) => onChange({ dob: e.target.value })}
           autoFocus
         />
       </div>
