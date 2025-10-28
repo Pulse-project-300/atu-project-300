@@ -1,32 +1,7 @@
-
 import { createClient } from "@/lib/supabase/server";
-//import { useState } from 'react';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  // State to hold generation status
-  //const [status, setStatus] = useState('');
-/*
-  // Function to handle plan generation
-  async function handleGenerate() {
-    setStatus('Generating...');
-    try {
-      const res = await fetch('/api/plans/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: 'demo-user',
-          profile: { goal: 'muscle gain', experience: 'beginner' }
-        }),
-      });
-
-      const data = await res.json();
-      setStatus(JSON.stringify(data, null, 2));
-    } catch (err: any) {
-      setStatus(err.message);
-    }
-  }
-*/
 
   const {
     data: { user },
@@ -45,9 +20,7 @@ export default async function DashboardPage() {
     <div className="flex-1 w-full flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Welcome to Pulse!</h1>
-        <p className="text-muted-foreground">
-          Logged in as {displayName}
-        </p>
+        <p className="text-muted-foreground">Logged in as {displayName}</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -70,8 +43,6 @@ export default async function DashboardPage() {
           </p>
         </div>
       </div>
-    
-
     </div>
   );
 }

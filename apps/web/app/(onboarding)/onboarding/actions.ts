@@ -15,9 +15,8 @@ export async function saveOnboardingProfile(data: OnboardingData) {
   }
 
   // Upsert user profile (insert if doesn't exist, update if it does)
-  const { error } = await supabase
-    .from("profiles")
-    .upsert({
+  const { error } = await supabase.from("profiles").upsert(
+    {
       user_id: user.id,
       email: user.email || "",
       dob: data.dob,
@@ -28,9 +27,12 @@ export async function saveOnboardingProfile(data: OnboardingData) {
       experience_level: data.experienceLevel,
       equipment: data.equipment,
       updated_at: new Date().toISOString(),
-    }, {
+      onboarding_completed: true,
+    },
+    {
       onConflict: "user_id", // Use user_id as the unique constraint
-    });
+    },
+  );
 
   if (error) {
     console.error("Error saving profile:", error);
