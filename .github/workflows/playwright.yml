@@ -1,9 +1,11 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
   pull_request:
-    branches: [ main, master ]
+    branches:
+      - main
 jobs:
   test:
     timeout-minutes: 60
@@ -13,12 +15,31 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+    - name: Install pnpm
+      run: npm install -g pnpm
     - name: Install dependencies
-      run: npm install -g pnpm && pnpm install
+      run: pnpm install --no-frozen-lockfile
+    - name: Install web app dependencies
+      run: cd apps/web && pnpm install --no-frozen-lockfile
+    - name: Verify workspace installation
+      run: |
+        echo "Checking apps/web node_modules..."
+        ls apps/web/node_modules/.bin/next || echo "ERROR: Next.js not installed!"
+        echo "Checking root node_modules..."
+        ls node_modules/@playwright || echo "ERROR: Playwright not installed!"
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
+    - name: Create environment files
+      run: |
+        # Create root .env.local for Playwright config
+        echo "TEST_USER_EMAIL=${{ secrets.TEST_USER_EMAIL }}" > .env.local
+        echo "TEST_USER_PASSWORD=${{ secrets.TEST_USER_PASSWORD }}" >> .env.local
+
+        # Create apps/web/.env.local for Next.js app
+        echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > apps/web/.env.local
+        echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> apps/web/.env.local
     - name: Run Playwright tests
-      run: pnpm exec playwright test
+      run: pnpm exec playwright test tests/end2end/login.spec.ts
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
