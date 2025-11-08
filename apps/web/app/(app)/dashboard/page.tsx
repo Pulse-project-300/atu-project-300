@@ -1,5 +1,9 @@
 import { DashboardAnalytics } from "@/components/dashboard/dashboard-analytics";
+import { WeeklyChart } from "@/components/dashboard/weekly-chart";
+import { RoutinesList } from "@/components/dashboard/routines-list";
+import { AIChatWidget } from "@/components/dashboard/ai-chat-widget";
 import { createClient } from "@/lib/supabase/server";
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -17,18 +21,31 @@ export default async function DashboardPage() {
   const displayName = profileData?.name || "User";
 
   return (
-    // Sections I want to include
+    <div className="w-full space-y-8 pb-8">
+      {/* Welcome Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          Welcome back, {displayName}!
+        </h1>
+        <p className="text-muted-foreground">
+          Here's your fitness overview and quick actions
+        </p>
+      </div>
 
-    //Bar chart of hours this week
-    // Allow user to click and explore analytics ?
-    // Total Workouts completed, workouts this week, This month, Total time spent working out. Profile Pic?
-    // View Full analytics
-    <div className="w-full">
+      {/* Analytics Metrics */}
       <DashboardAnalytics />
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Weekly Activity Chart */}
+        <WeeklyChart />
+
+        {/* Routines List */}
+        <RoutinesList />
+      </div>
+
+      {/* AI Chat Widget */}
+      <AIChatWidget />
     </div>
-
-    // List Some of the routines with a start routine Button
-
-    // Little chat box where you can chat to the AI
   );
 }

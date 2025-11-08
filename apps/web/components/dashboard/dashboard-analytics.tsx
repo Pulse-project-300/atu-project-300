@@ -1,11 +1,12 @@
-import { Activity, Clock, TrendingUp, BarChart3 } from "lucide-react";
+import { Activity, Clock, TrendingUp, BarChart3, Calendar } from "lucide-react";
 import Link from "next/link";
 
 export function DashboardAnalytics() {
   return (
+    //TODO Replace default values with actual user values
     <div className="space-y-6">
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Workouts Card */}
         <div className="group relative overflow-hidden rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -30,7 +31,7 @@ export function DashboardAnalytics() {
           <div className="relative flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Total Time in Gym
+                Total Time
               </p>
               <p className="mt-2 text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 0h
@@ -48,7 +49,7 @@ export function DashboardAnalytics() {
           <div className="relative flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Workouts This Week
+                This Week
               </p>
               <p className="mt-2 text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 0
@@ -56,6 +57,24 @@ export function DashboardAnalytics() {
             </div>
             <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-3">
               <TrendingUp className="h-6 w-6 text-white" />
+            </div>
+          </div>
+        </div>
+
+        {/* Workouts This Month Card */}
+        <div className="group relative overflow-hidden rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity group-hover:opacity-100" />
+          <div className="relative flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                This Month
+              </p>
+              <p className="mt-2 text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                0
+              </p>
+            </div>
+            <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-3">
+              <Calendar className="h-6 w-6 text-white" />
             </div>
           </div>
         </div>
