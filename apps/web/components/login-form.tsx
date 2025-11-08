@@ -56,7 +56,7 @@ export function LoginForm({
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/callback`,
+          redirectTo: `${window.location.origin}/callback?intent=login`,
         },
       });
 
@@ -163,11 +163,7 @@ export function LoginForm({
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link
-                href="/sign-up"
-                className="underline underline-offset-4"
-                data-testid="sign-up-link"
-              >
+              <Link href="/sign-up" className="underline underline-offset-4">
                 Sign up
               </Link>
             </div>

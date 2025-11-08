@@ -10,22 +10,8 @@ export async function AuthButton() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let displayName = "User";
-
-  if (user) {
-    // Fetch user name from database
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("name")
-      .eq("id", user.id)
-      .single();
-
-    displayName = profileData?.name || "User";
-  }
-
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {displayName}!
       <LogoutButton />
     </div>
   ) : (

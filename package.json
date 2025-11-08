@@ -4,7 +4,10 @@
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "build": "pnpm -r --filter \"./{apps,packages}/*\" run build",
-    "dev": "pnpm -r --parallel --filter \"./apps/*\" run dev",
+    "dev": "concurrently -n \"web,api,ai\" -c \"cyan,magenta,yellow\" \"pnpm --filter ./apps/web dev\" \"pnpm --filter api dev\" \"cd services/ai-orchestrator && ./venv/bin/uvicorn app.main:app --reload --port 8001\"",
+    "dev:web": "pnpm --filter ./apps/web dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:ai": "cd services/ai-orchestrator && ./venv/bin/uvicorn app.main:app --reload --port 8001",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
     "typecheck": "pnpm -r run typecheck",
@@ -14,6 +17,7 @@
   "devDependencies": {
     "@playwright/test": "^1.56.0",
     "@types/node": "^24.7.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.12.0",
     "prettier": "^3.3.3",
     "tsx": "^4.19.1",
