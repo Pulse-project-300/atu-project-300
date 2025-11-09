@@ -8,7 +8,7 @@ router = APIRouter(tags=["plan"])
 def generate_plan(req: GenerateRequest):
     # Placeholder plan (will replace with Langflow/OpenAI call)
     plan = {
-        "version": 1,
+        "version": 4,
         "days": [
             {"day": "Mon", "workout": [{"name":"Squat","sets":3,"reps":10}]},
             {"day": "Wed", "workout": [{"name":"Bench","sets":3,"reps":10}]},
