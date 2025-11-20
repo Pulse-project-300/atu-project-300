@@ -9,7 +9,7 @@ sequenceDiagram
   participant DB as Supabase Postgres
   participant RT as Supabase Realtime
 
-  U->>Web: Sign up / login (Google, GitHub, etc.)
+  U->>Web: Sign up / login (Google)
   Web->>Auth: OAuth sign-in request
   Auth-->>Web: session (includes JWT)
 
