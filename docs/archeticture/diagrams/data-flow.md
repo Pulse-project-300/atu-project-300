@@ -1,17 +1,17 @@
 ```mermaid
 sequenceDiagram
   autonumber
-  participant U as User (Browser)
+   participant U as User (Browser)
   participant Web as apps/web (Next.js)
-  participant Auth as Supabase Auth
+  participant Auth as Supabase Auth (OAuth + JWT)
   participant API as services/api (Express)
   participant AI as services/ai-orchestrator (FastAPI)
   participant DB as Supabase Postgres
   participant RT as Supabase Realtime
 
-  U->>Web: Sign up / login
-  Web->>Auth: createUser / signIn
-  Auth-->>Web: session + JWT
+  U->>Web: Sign up / login (Google)
+  Web->>Auth: OAuth sign-in request
+  Auth-->>Web: session (includes JWT)
 
   U->>Web: Complete onboarding (goals, equipment, stats)
   Web->>API: POST /plans/generate (JWT, profile)
