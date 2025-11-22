@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: infra/docker/api.Dockerfile
+    environment:
+      - PORT=8000
+      - AI_ORCHESTRATOR_URL=http://ai:8001
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ai
+      - langflow
+
+  ai:
+    build:
+      context: ../
+      dockerfile: infra/docker/ai-orchestrator.Dockerfile
+    environment:
+      - LANGFLOW_BASE_URL=http://langflow:7860
+      - LANGFLOW_GENERATE_FLOW_ID=
+      - LANGFLOW_ADAPT_FLOW_ID=
+    ports:
+      - "8001:8001"
+    depends_on:
+      - langflow
+
+  langflow:
+    image: langflowai/langflow:latest
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_HOST=0.0.0.0
+      - LANGFLOW_PORT=7860
+    volumes:
+      - ../langflow:/app/langflow   # persist flows between runs
