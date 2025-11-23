@@ -37,9 +37,16 @@ export async function adaptPlan(input: {
 }
 
 /**
- * GET /plan/explain
+ * POST /plan/explain
+ * Generate an AI-powered explanation of a workout plan
  */
-export async function getPlanExplanation() {
-  const { data } = await axios.get(`${AI_ORCHESTRATOR_URL}/plan/explain`);
+export async function getPlanExplanation(input: {
+  plan: Record<string, any>;
+  userId?: string;
+  profile?: Record<string, any>;
+}) {
+  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/explain`, input, {
+    timeout: 15000,
+  });
   return data;
 }
