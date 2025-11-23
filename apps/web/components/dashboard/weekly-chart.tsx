@@ -58,7 +58,7 @@ export function WeeklyChart() {
               <div
                 className={`text-xs font-medium ${
                   isToday
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                    ? "text-purple-600"
                     : "text-muted-foreground"
                 }`}
               >

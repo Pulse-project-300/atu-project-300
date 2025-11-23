@@ -25,18 +25,20 @@ export default async function AppLayout({
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
           <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
             <div className="flex gap-5 items-center font-semibold">
-              <Link href={"/dashboard"}>Pulse</Link>
+              <Link href={"/dashboard"} className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Pulse
+              </Link>
               <div className="flex gap-4 text-muted-foreground font-normal">
-                <Link href="/dashboard" className="hover:text-foreground">
+                <Link href="/dashboard" className="hover:text-purple-600 transition-colors">
                   Dashboard
                 </Link>
-                <Link href="/workouts" className="hover:text-foreground">
-                  Workouts
+                <Link href="/workouts" className="hover:text-purple-600 transition-colors">
+                  Routines
                 </Link>
-                <Link href="/progress" className="hover:text-foreground">
+                <Link href="/progress" className="hover:text-purple-600 transition-colors">
                   Progress
                 </Link>
-                <Link href="/achievements" className="hover:text-foreground">
+                <Link href="/achievements" className="hover:text-purple-600 transition-colors">
                   Achievements
                 </Link>
               </div>
@@ -52,7 +54,9 @@ export default async function AppLayout({
         </div>
 
         <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-8">
-          <p className="text-muted-foreground">© 2025 Pulse. All rights reserved.</p>
+          <p className="text-muted-foreground">
+            © 2025 Pulse. All rights reserved.
+          </p>
         </footer>
       </div>
     </main>

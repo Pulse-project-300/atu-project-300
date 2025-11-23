@@ -191,6 +191,7 @@ export function SignUpForm({
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button
                 type="submit"
+                variant="gradient"
                 className="w-full"
                 disabled={isLoading || isGoogleLoading}
               >

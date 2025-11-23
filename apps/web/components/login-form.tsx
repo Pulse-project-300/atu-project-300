@@ -154,6 +154,7 @@ export function LoginForm({
               {error && <p className="text-sm text-red-500" data-testid="login-error">{error}</p>}
               <Button
                 type="submit"
+                variant="gradient"
                 className="w-full"
                 disabled={isLoading || isGoogleLoading}
                 data-testid="login-submit-button"
