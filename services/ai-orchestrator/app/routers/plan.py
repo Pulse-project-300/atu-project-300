@@ -1,5 +1,6 @@
-from fastapi import APIRouter
-from app.models.request import GenerateRequest
+from fastapi import APIRouter, HTTPException
+from app.models.request import GenerateRequest, ExplainRequest
+from app.core.openai_client import explain_plan
 
 router = APIRouter(tags=["plan"])
 
@@ -30,8 +31,30 @@ def adapt_plan(req: GenerateRequest):
     }
     return {"plan": adapted_plan, "userId": req.userId}
 
-@router.get("/explain")
-def explain_plan():
-    # Placeholder explanation (will replace with AI chat explanation)
-    explanation = "This plan focuses on compound lifts to build overall strength."
-    return {"explanation": explanation} 
+@router.post("/explain")
+async def explain_plan_endpoint(req: ExplainRequest):
+    """
+    Generate an AI-powered explanation of a workout plan.
+
+    Uses OpenAI's GPT model to create a detailed, personalized explanation
+    that helps users understand their workout plan's purpose and benefits.
+
+    Args:
+        req: ExplainRequest containing the plan and optional user context
+
+    Returns:
+        Dict with the AI-generated explanation
+
+    Raises:
+        HTTPException: If the OpenAI API call fails
+    """
+    try:
+        # Call OpenAI to generate the explanation
+        explanation = await explain_plan(req.plan, req.profile)
+        return {"explanation": explanation}
+    except Exception as e:
+        # Handle API errors gracefully
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate explanation: {str(e)}"
+        ) 
