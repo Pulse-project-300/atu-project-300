@@ -12,7 +12,11 @@ export default async function Home() {
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 flex flex-col items-center justify-center max-w-4xl px-5 text-center gap-8">
         <h1 className="text-4xl md:text-6xl font-bold">
-          Your Fitness. Personalised. Evolving
+          Your Fitness.{" "}
+          <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Personalised.
+          </span>{" "}
+          Evolving
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl">
           Custom workout plans powered by AI — evolving with your goals,
@@ -20,12 +24,12 @@ export default async function Home() {
         </p>
         <div className="flex gap-4">
           {user ? (
-            <Button asChild size="lg">
+            <Button asChild variant="gradient" size="lg">
               <Link href="/dashboard">Go to Dashboard</Link>
             </Button>
           ) : (
             <>
-              <Button asChild size="lg">
+              <Button asChild variant="gradient" size="lg">
                 <Link href="/sign-up">Get Started</Link>
               </Button>
               <Button asChild variant="outline" size="lg">

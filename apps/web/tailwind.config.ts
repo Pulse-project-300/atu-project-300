@@ -57,6 +57,10 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      backgroundImage: {
+        'gradient-brand': 'linear-gradient(to right, rgb(168 85 247), rgb(236 72 153))',
+        'gradient-brand-subtle': 'linear-gradient(to right, rgb(168 85 247 / 0.1), rgb(236 72 153 / 0.1))',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
