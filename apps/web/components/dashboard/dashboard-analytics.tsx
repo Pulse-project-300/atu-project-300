@@ -2,8 +2,15 @@ import { Activity, Clock, TrendingUp, BarChart3, Calendar } from "lucide-react";
 import Link from "next/link";
 
 export function DashboardAnalytics() {
+  // Mock data for demonstration
+  const mockData = {
+    totalWorkouts: 47,
+    totalTime: 32,
+    thisWeek: 4,
+    thisMonth: 18,
+  };
+
   return (
-    //TODO Replace default values with actual user values
     <div className="space-y-6">
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -15,7 +22,7 @@ export function DashboardAnalytics() {
               <p className="text-sm font-medium text-muted-foreground">
                 Total Workouts
               </p>
-              <p className="mt-2 text-3xl font-bold">0</p>
+              <p className="mt-2 text-3xl font-bold">{mockData.totalWorkouts}</p>
             </div>
             <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-3">
               <Activity className="h-6 w-6 text-white" />
@@ -31,7 +38,7 @@ export function DashboardAnalytics() {
               <p className="text-sm font-medium text-muted-foreground">
                 Total Time
               </p>
-              <p className="mt-2 text-3xl font-bold">0h</p>
+              <p className="mt-2 text-3xl font-bold">{mockData.totalTime}h</p>
             </div>
             <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-3">
               <Clock className="h-6 w-6 text-white" />
@@ -47,7 +54,7 @@ export function DashboardAnalytics() {
               <p className="text-sm font-medium text-muted-foreground">
                 This Week
               </p>
-              <p className="mt-2 text-3xl font-bold">0</p>
+              <p className="mt-2 text-3xl font-bold">{mockData.thisWeek}</p>
             </div>
             <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-3">
               <TrendingUp className="h-6 w-6 text-white" />
@@ -63,7 +70,7 @@ export function DashboardAnalytics() {
               <p className="text-sm font-medium text-muted-foreground">
                 This Month
               </p>
-              <p className="mt-2 text-3xl font-bold">0</p>
+              <p className="mt-2 text-3xl font-bold">{mockData.thisMonth}</p>
             </div>
             <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-3">
               <Calendar className="h-6 w-6 text-white" />

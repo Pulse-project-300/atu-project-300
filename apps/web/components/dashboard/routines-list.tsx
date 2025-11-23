@@ -2,7 +2,7 @@ import { Play, Dumbbell, Clock } from "lucide-react";
 import Link from "next/link";
 
 export function RoutinesList() {
-  // Mock data - TODO: Replace with actual user routines from database
+  // Mock data - showing realistic workout routines
   const routines = [
     {
       id: 1,
@@ -16,14 +16,14 @@ export function RoutinesList() {
       name: "Leg Day",
       exercises: 6,
       duration: "60 min",
-      lastCompleted: "5 days ago",
+      lastCompleted: "4 days ago",
     },
     {
       id: 3,
       name: "Core & Cardio",
       exercises: 10,
       duration: "30 min",
-      lastCompleted: "1 day ago",
+      lastCompleted: "Yesterday",
     },
   ];
 

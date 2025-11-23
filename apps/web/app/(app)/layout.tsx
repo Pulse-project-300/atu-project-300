@@ -29,9 +29,6 @@ export default async function AppLayout({
                 Pulse
               </Link>
               <div className="flex gap-4 text-muted-foreground font-normal">
-                <Link href="/dashboard" className="hover:text-purple-600 transition-colors">
-                  Dashboard
-                </Link>
                 <Link href="/workouts" className="hover:text-purple-600 transition-colors">
                   Routines
                 </Link>
