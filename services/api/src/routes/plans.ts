@@ -20,6 +20,12 @@ const AdaptSchema = z.object({
   currentVersion: z.number().optional(),
 });
 
+const ExplainSchema = z.object({
+  plan: z.record(z.any()),
+  userId: z.string().optional(),
+  profile: z.record(z.any()).optional(),
+});
+
 // POST /plans/generate
 router.post("/generate", async (req: Request, res: Response) => {
   try {
@@ -44,14 +50,15 @@ router.post("/adapt", async (req: Request, res: Response) => {
   }
 });
 
-// GET /plans/explain
-router.get("/explain", async (_req: Request, res: Response) => {
+// POST /plans/explain
+router.post("/explain", async (req: Request, res: Response) => {
   try {
-    const data = await getPlanExplanation();
+    const input = ExplainSchema.parse(req.body);
+    const data = await getPlanExplanation(input);
     res.json(data);
   } catch (err: any) {
     console.error("Error in /plans/explain:", err);
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
