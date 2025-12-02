@@ -1,6 +1,12 @@
 import { Router, Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
-import type {Badge, UserBadge, BadgeWithEarnedStatus, AwardBadgeRequest, AwardBadgeResponse,} from "@repo/types";
+import type {
+  Badge,
+  UserBadge,
+  BadgeWithEarnedStatus,
+  AwardBadgeRequest,
+  AwardBadgeResponse,
+} from "../types";
 
 const router = Router();
 
