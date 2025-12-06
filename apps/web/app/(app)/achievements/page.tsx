@@ -1,3 +1,5 @@
+import { AchievementsClient } from "@/components/achievements/achievements-client";
+
 export default function AchievementsPage() {
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
@@ -8,11 +10,7 @@ export default function AchievementsPage() {
         </p>
       </div>
 
-      <div className="p-6 border rounded-lg text-center">
-        <p className="text-muted-foreground">
-          Achievements feature coming soon...
-        </p>
-      </div>
+      <AchievementsClient />
     </div>
   );
 }

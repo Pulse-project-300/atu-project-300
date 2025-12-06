@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import healthRouter from "./routes/health.js";
 import plansRouter from "./routes/plans.js";
+import badgesRouter from "./routes/badges.js";
 
 
 const app = express();
@@ -16,6 +17,9 @@ app.use("/health", healthRouter);
 
 // Mounting the plans router
 app.use("/plans", plansRouter);
+
+// Mounting the badges router
+app.use("/badges", badgesRouter);
 
 
 const port = process.env.PORT || 8000;
