@@ -1,6 +1,10 @@
 import os
+from dotenv import load_dotenv
 
-# Configuration for OpenAI api and Langflow 
+# Load environment variables from .env file
+load_dotenv()
+
+# Configuration for OpenAI api and Langflow
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "") # openAI key from environment
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4") # Default to GPT-4, but can be changed
