@@ -50,3 +50,18 @@ export async function getPlanExplanation(input: {
   });
   return data;
 }
+
+/**
+ * POST /plan/chat
+ * Engage in a chat conversation about the workout plan
+ */
+export async function chatAboutPlan(input: {
+  userId: string;
+  messages: { role: "user" | "assistant"; content: string }[];
+  planContext?: Record<string, any>;
+}) {
+  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/chat`, input, {
+    timeout: 15000,
+  });
+  return data;
+} 
