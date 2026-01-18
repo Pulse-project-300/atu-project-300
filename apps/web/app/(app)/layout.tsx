@@ -38,8 +38,8 @@ export default async function AppLayout({
                 <Link href="/achievements" className="hover:text-purple-600 transition-colors">
                   Achievements
                 </Link>
-                <Link href="/ai-assistant" className="hover:text-foreground">
-                  AI Assistant
+                <Link href="/user-plan" className="hover:text-foreground">
+                  Current Plan
                 </Link>
               </div>
             </div>
