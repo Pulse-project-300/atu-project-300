@@ -1,102 +1,166 @@
 """
-OpenAI client for AI-powered text generation and summarization.
+OpenAI client for AI-powered workout plan generation, adaptation, explanation, and chat.
 
 This module provides helper functions that use OpenAI's GPT models to generate
-human-friendly explanations, summaries, and other text content for workout plans.
+human-friendly workout plans, explanations, summaries, and other text content for workout plans.
 
 
-Example:
-    >>> plan = {"days": [{"day": "Mon", "workout": "Squats"}]}
-    >>> summary = await summarize_plan_text(plan)
-    >>> print(summary)
-    "This workout plan focuses on building strength with a Monday squat session..."
 """
 
 from openai import AsyncOpenAI
 from app.core.config import OPENAI_API_KEY
 
-# Initialize the async OpenAI client with API key from environment configuration
-# This client is reused across all function calls for efficiency
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
-async def summarize_plan_text(plan: dict) -> str:
+async def generate_workout_plan(profile: dict, history: list | None = None) -> dict:
     """
-    Generate a concise, user-friendly summary of a workout plan using GPT-4o-mini.
+    Generate a personalized workout plan using GPT-4o.
 
-    This function takes a structured workout plan and uses OpenAI's language model
-    to create a natural language summary that explains the plan to users in an
-    encouraging, easy-to-understand way.
+    This function creates a complete workout plan tailored to the user's profile,
+    goals, experience level, and available equipment. It returns a structured
+    workout plan in JSON format.
 
     Args:
-        plan: A dictionary containing the workout plan structure, typically with:
-            {
-                "days": [
-                    {
-                        "day": str,  # e.g., "Mon", "Wed", "Fri"
-                        "workout": [
-                            {"name": str, "sets": int, "reps": int},
-                            ...
-                        ]
-                    },
-                    ...
-                ]
-            }
+        profile: User profile containing:
+            - goal: User's fitness goal (e.g., "build muscle", "lose weight", "get stronger")
+            - experience: Fitness level (e.g., "beginner", "intermediate", "advanced")
+            - equipment: List of available equipment (e.g., ["full_gym"], ["dumbbells", "resistance_bands"])
+            - dob: Date of birth (YYYY-MM-DD format) for age calculation
+            - gender: User's gender ("male", "female", "other")
+            - height_cm: Height in centimeters
+            - weight_kg: Weight in kilograms
+        history: Optional list of previous workout logs to inform plan generation
 
     Returns:
-        str: A 2-sentence summary of the workout plan in friendly, motivational language.
-            Example: "This workout plan targets your major muscle groups with a balanced
-            approach. You'll build strength through compound movements like squats and deadlifts."
+        dict: A structured workout plan with format
 
-    Raises:
-        openai.APIError: If the OpenAI API request fails
-        openai.AuthenticationError: If the API key is invalid or missing
 
-    Note:
-        Uses the gpt-4o-mini model for cost efficiency. The model is configured with
-        a system prompt to act as a "concise, friendly fitness coach" to ensure
-        appropriate tone and brevity in responses.
     """
-    # Construct the prompt asking the AI to summarize the workout plan
-    content = f"Summarise this workout plan in 2 sentences for a user:\n\n{plan}"
+    import json
+    from datetime import datetime
 
-    # Call OpenAI's chat completion API with the fitness coach persona
+    # Extract and format profile information for better context
+    age = None
+    if "dob" in profile and profile["dob"]:
+        try:
+            birth_date = datetime.strptime(profile["dob"], "%Y-%m-%d")
+            today = datetime.today()
+            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+        except:
+            pass
+
+    # Build detailed context about the user
+    user_context = []
+
+    # Demographics
+    if age:
+        user_context.append(f"Age: {age} years old")
+    if "gender" in profile and profile["gender"]:
+        user_context.append(f"Gender: {profile['gender']}")
+    if "height_cm" in profile and profile["height_cm"]:
+        user_context.append(f"Height: {profile['height_cm']} cm")
+    if "weight_kg" in profile and profile["weight_kg"]:
+        user_context.append(f"Weight: {profile['weight_kg']} kg")
+
+    # Fitness profile
+    goal = profile.get("goal", "general fitness")
+    experience = profile.get("experience", "beginner")
+    equipment = profile.get("equipment", [])
+
+    user_context.append(f"Fitness Goal: {goal}")
+    user_context.append(f"Experience Level: {experience}")
+    user_context.append(f"Available Equipment: {', '.join(equipment) if equipment else 'bodyweight only'}")
+
+    context = "USER PROFILE:\n" + "\n".join(user_context) + "\n\n"
+
+    if history and len(history) > 0:
+        context += f"Previous workout history:\n{json.dumps(history, indent=2)}\n\n"
+
+    prompt = f"""{context}Generate a personalized workout plan for this user based on their complete profile.
+
+IMPORTANT EQUIPMENT CONSIDERATIONS:
+- full_gym: Use any gym equipment (barbells, machines, cables, etc.)
+- home_gym: Use barbells, rack, bench, and plates
+- dumbbells: Use only dumbbell exercises
+- resistance_bands: Use only resistance band exercises
+- bodyweight_only: Use only bodyweight exercises (no equipment)
+
+Return ONLY a valid JSON object with this exact structure (no markdown, no explanations):
+{{
+  "version": 1,
+  "days": [
+    {{
+      "day": "Mon",
+      "workout": [
+        {{"name": "Exercise Name", "sets": 3, "reps": 10}}
+      ]
+    }}
+  ]
+}}
+
+REQUIREMENTS:
+1. Training Frequency:
+   - Beginner: 3-4 days per week
+   - Intermediate: 4-5 days per week
+   - Advanced: 5-6 days per week
+
+2. Use day abbreviations: Mon, Tue, Wed, Thu, Fri, Sat, Sun
+
+3. Exercise Selection:
+   - Choose exercises that match the user's available equipment EXACTLY
+   - Match difficulty to experience level
+   - Consider age and gender for appropriate exercise selection
+   - Use the user's body weight and height to suggest appropriate starting weights/difficulty
+
+4. Volume and Intensity (sets x reps):
+   - For "strength" or "get stronger" goals: 3-5 sets of 3-6 reps
+   - For "hypertrophy" or "build muscle" goals: 3-4 sets of 8-12 reps
+   - For "endurance" or "lose weight" goals: 2-3 sets of 12-20 reps
+   - Adjust volume based on experience (beginners need less)
+
+5. Programming:
+   - Balance muscle groups throughout the week
+   - Include compound movements for beginners/intermediates
+   - Add accessory work for intermediate/advanced
+   - Consider recovery needs based on age
+
+Return ONLY the JSON object, no additional text or markdown."""
+
+    # Call OpenAI's chat completion API
     resp = await client.chat.completions.create(
-        model="gpt-4o-mini",  # mini model for faster, cheaper responses (this model can be changed as needed) 
+        model="gpt-4o",  
         messages=[
-            # System message sets the AI's personality and behavior
-            {"role": "system", "content": "You are a concise, friendly fitness coach."},
-            # User message contains the actual task/question
-            {"role": "user", "content": content},
+            {
+                "role": "system",
+                "content": "You are an expert fitness coach and programming specialist. Generate personalized workout plans in valid JSON format only."
+            },
+            {"role": "user", "content": prompt},
         ],
+        response_format={"type": "json_object"}  
     )
 
-    # Extract the generated text from the response and remove extra whitespace
-    return resp.choices[0].message.content.strip()
+    # Extract and parse the JSON response
+    content = resp.choices[0].message.content.strip()
+
+    try:
+        plan = json.loads(content)
+        return plan
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Failed to parse OpenAI response as JSON: {e}")
 
 
 async def explain_plan(plan: dict, profile: dict | None = None) -> str:
     """
     Generate a detailed, personalized explanation of a workout plan using GPT-4o-mini.
 
-    This function analyzes a workout plan and creates a comprehensive explanation that
+    This function analyses a workout plan and creates a comprehensive explanation that
     helps users understand the purpose, benefits, and rationale behind their training
     program. The explanation is tailored to the user's profile when provided.
 
     Args:
-        plan: A dictionary containing the workout plan structure with:
-            {
-                "days": [
-                    {
-                        "day": str,  # e.g., "Mon", "Wed", "Fri"
-                        "workout": [
-                            {"name": str, "sets": int, "reps": int},
-                            ...
-                        ]
-                    },
-                    ...
-                ]
-            }
+        plan: A dictionary containing the workout plan structure
+            
         profile: Optional user profile for personalized explanations, containing:
             - goal: User's fitness goal (e.g., "strength", "hypertrophy", "endurance")
             - experience: Fitness level (e.g., "beginner", "intermediate", "advanced")
@@ -109,18 +173,6 @@ async def explain_plan(plan: dict, profile: dict | None = None) -> str:
             - How the exercises work together
             - Expected benefits and outcomes
             - Any progressive elements or periodization
-
-        Example: "This plan emphasizes compound movements to build foundational strength
-        across all major muscle groups. The Monday squat session targets your lower body,
-        while Wednesday's bench press develops upper body pushing strength. Friday's
-        deadlifts complete the program by training posterior chain muscles and grip strength.
-        Together, these exercises create a balanced program that will improve your overall
-        strength and muscle development."
-
-    Raises:
-        openai.APIError: If the OpenAI API request fails
-        openai.AuthenticationError: If the API key is invalid or missing
-        openai.RateLimitError: If quota is exceeded
 
     Note:
         The explanation is generated with context about the user's profile when available,
@@ -150,4 +202,62 @@ async def explain_plan(plan: dict, profile: dict | None = None) -> str:
     )
 
     # Extract and return the explanation
+    return resp.choices[0].message.content.strip()
+
+
+
+
+async def chat_about_workout(message: str, workout_plan: dict | None = None, chat_history: list | None = None) -> str:
+    """
+    Chat with the AI about workout plans, fitness advice, and training questions.
+
+    This function provides an interactive chat experience where users can ask
+    questions about their workout plans, get fitness advice, or discuss training
+    topics with an AI fitness coach.
+
+    Args:
+        message: The user's question or message
+        workout_plan: Optional current workout plan for context
+        chat_history: Optional list of previous messages for conversation continuity
+            Format: [{"role": "user" or "assistant", "content": str}, ...]
+
+    Returns:
+        str: The AI's response to the user's message
+
+    """
+    import json
+
+    # Build the system prompt with workout context if available
+    system_prompt = """You are an experienced and friendly fitness coach having a conversation with a client.
+Your role is to:
+- Answer questions about workout plans, exercises, and training
+- Provide practical, science-based fitness advice
+- Help users understand their workout programming
+- Give tips on form, technique, and progression
+- Motivate and encourage users in their fitness journey
+
+Keep responses conversational, clear, and concise (2-4 sentences typically).
+Be supportive and positive while maintaining professional expertise."""
+
+    if workout_plan:
+        system_prompt += f"\n\nThe user's current workout plan is:\n{json.dumps(workout_plan, indent=2)}\n\nRefer to this plan when relevant to their questions."
+
+    # Build the conversation messages
+    messages = [{"role": "system", "content": system_prompt}]
+
+    # Add chat history if available
+    if chat_history and len(chat_history) > 0:
+        messages.extend(chat_history)
+
+    # Add the current user message
+    messages.append({"role": "user", "content": message})
+
+    # Call OpenAI's chat completion API
+    resp = await client.chat.completions.create(
+        model="gpt-4o-mini",  # Use mini for fast, cost-effective chat
+        messages=messages,
+        temperature=0.7,  # Slightly creative for natural conversation
+    )
+
+    # Extract and return the response
     return resp.choices[0].message.content.strip()
