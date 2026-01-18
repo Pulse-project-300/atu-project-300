@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Pulse API service (Express + TypeScript) – handles plans, workouts, progress, badges.",
+  "description": "Pulse API service (Express + TypeScript) - handles plans, workouts, progress, badges.",
   "engines": {
     "node": ">=18"
   },
