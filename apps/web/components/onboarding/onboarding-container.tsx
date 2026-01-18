@@ -15,6 +15,7 @@ import { TOTAL_STEPS } from "@/lib/onboarding/constants";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveOnboardingProfile } from "@/app/(onboarding)/onboarding/actions";
+import { saveWorkoutPlan } from "@/app/(onboarding)/onboarding/plan-actions";
 
 export function OnboardingContainer() {
   const { data, currentStep, updateData, nextStep, previousStep } =
@@ -83,13 +84,28 @@ export function OnboardingContainer() {
           }),
         });
 
-        const responseData = await res.json();
-        setStatus("Success! Profile saved and plan generated.\n\n" + JSON.stringify(responseData, null, 2));
+        if (!res.ok) {
+          throw new Error(`Failed to generate plan: ${res.statusText}`);
+        }
 
-        // Optional: Redirect to dashboard after success
+        const responseData = await res.json();
+
+        // Step 3: Save the generated plan to the database
+        setStatus("Saving your workout plan...");
+        const savePlanResult = await saveWorkoutPlan(responseData.plan);
+
+        if (savePlanResult.error) {
+          setStatus(`Error saving plan: ${savePlanResult.error}`);
+          console.error("Error saving plan:", savePlanResult.error);
+          return;
+        }
+
+        setStatus("Success! Your personalized workout plan is ready.");
+
+        // Redirect to user-plan page after success
         setTimeout(() => {
-          router.push("/dashboard");
-        }, 2000);
+          router.push("/user-plan");
+        }, 1500);
 
       } catch (error) {
         console.error("Error during onboarding:", error);
