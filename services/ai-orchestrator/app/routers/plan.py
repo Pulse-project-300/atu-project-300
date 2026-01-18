@@ -1,22 +1,34 @@
 from fastapi import APIRouter, HTTPException
-from app.models.request import GenerateRequest, ExplainRequest
-from app.core.openai_client import explain_plan
+from app.models.request import GenerateRequest, ExplainRequest, ChatRequest
+from app.core.openai_client import explain_plan, generate_workout_plan, chat_about_workout
 
 router = APIRouter(tags=["plan"])
 
-# Placeholder for plan generation logic
 @router.post("/generate")
-def generate_plan(req: GenerateRequest):
-    # Placeholder plan (will replace with Langflow/OpenAI call)
-    plan = {
-        "version": 1,
-        "days": [
-            {"day": "Mon", "workout": [{"name":"Squat","sets":3,"reps":10}]},
-            {"day": "Wed", "workout": [{"name":"Bench","sets":3,"reps":10}]},
-            {"day": "Fri", "workout": [{"name":"Deadlift","sets":3,"reps":5}]}
-        ]
-    }
-    return {"plan": plan, "userId": req.userId}
+async def generate_plan(req: GenerateRequest):
+    """
+    Generate a personalized AI-powered workout plan.
+
+    Uses OpenAI's GPT-4o model to create a customised workout plan based on
+    the user's profile, goals, experience level, and available equipment.
+
+    Args:
+        req: GenerateRequest containing userId, profile, and optional history
+
+    Returns:
+        Dict with the generated plan and userId
+
+    """
+    try:
+        # Call OpenAI to generate the workout plan
+        plan = await generate_workout_plan(req.profile, req.history)
+        return {"plan": plan, "userId": req.userId}
+    except Exception as e:
+        # Handle API errors gracefully
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate workout plan: {str(e)}"
+        )
 
 @router.post("/adapt")
 def adapt_plan(req: GenerateRequest):
@@ -45,8 +57,6 @@ async def explain_plan_endpoint(req: ExplainRequest):
     Returns:
         Dict with the AI-generated explanation
 
-    Raises:
-        HTTPException: If the OpenAI API call fails
     """
     try:
         # Call OpenAI to generate the explanation
@@ -57,4 +67,37 @@ async def explain_plan_endpoint(req: ExplainRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate explanation: {str(e)}"
+        )
+
+@router.post("/chat")
+async def chat_endpoint(req: ChatRequest):
+    """
+    Chat with the AI about workout plans and fitness topics.
+
+    Provides an interactive conversational experience where users can ask
+    questions, get advice, and discuss their training with an AI fitness coach.
+
+    Args:
+        req: ChatRequest containing the message, optional workout plan, and chat history
+
+    Returns:
+        Dict with the AI's response message
+
+    """
+    try:
+        # Convert chat history to the format expected by OpenAI
+        chat_history = [{"role": msg.role, "content": msg.content} for msg in req.chatHistory]
+
+        # Call OpenAI to get the chat response
+        response = await chat_about_workout(
+            message=req.message,
+            workout_plan=req.workoutPlan,
+            chat_history=chat_history
+        )
+        return {"response": response}
+    except Exception as e:
+        # Handle API errors gracefully
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get chat response: {str(e)}"
         ) 
