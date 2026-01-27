@@ -212,7 +212,7 @@ export default function CreateRoutinePage() {
             key={exercise.id}
             className="flex items-center gap-3 p-4 rounded-lg border bg-card"
           >
-            <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+            
 
             <div className="flex-1">
               <div className="font-medium">{exercise.exercise_name}</div>
