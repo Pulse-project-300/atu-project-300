@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Plus, Save, X, GripVertical, Search, Dumbbell } from "lucide-react";
+import { ArrowLeft, Plus, Save, X, Search, Dumbbell } from "lucide-react";
 import Link from "next/link";
+import { createRoutine, searchExercises } from "@/app/(app)/workouts/actions";
 import type { CreateRoutineExerciseInput, ExerciseLibraryItem } from "@/lib/types/workouts";
 
 interface ExerciseEntry extends CreateRoutineExerciseInput {
@@ -30,29 +30,14 @@ export default function CreateRoutinePage() {
       return;
     }
 
-    const searchExercises = async () => {
+    const doSearch = async () => {
       setIsSearching(true);
-      const supabase = createClient();
-
-      const { data, error } = await supabase
-        .from("new_exercises")
-        .select("rowid, name, equipment, category")
-        .ilike("name", `%${searchQuery}%`)
-        .limit(10);
-
-      console.log("Search query:", searchQuery);
-      console.log("Results:", data);
-      console.log("Error:", error);
-
-      if (error) {
-        console.error("Search error:", error);
-      }
-
-      setSearchResults((data || []) as ExerciseLibraryItem[]);
+      const results = await searchExercises(searchQuery);
+      setSearchResults(results);
       setIsSearching(false);
     };
 
-    const debounce = setTimeout(searchExercises, 300);
+    const debounce = setTimeout(doSearch, 300);
     return () => clearTimeout(debounce);
   }, [searchQuery]);
 
@@ -120,47 +105,12 @@ export default function CreateRoutinePage() {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+    const result = await createRoutine(name.trim(), exercises);
 
-      if (!user) {
-        setError("You must be logged in");
-        return;
-      }
-
-      // Create the routine
-      const { data: routine, error: routineError } = await supabase
-        .from("routines")
-        .insert({
-          user_id: user.id,
-          name: name.trim(),
-        })
-        .select()
-        .single();
-
-      if (routineError) throw routineError;
-
-      // Create all exercises
-      const exercisesToInsert = exercises.map((ex, index) => ({
-        routine_id: routine.id,
-        exercise_library_id: ex.exercise_library_id || null,
-        exercise_name: ex.exercise_name,
-        target_sets: ex.target_sets,
-        target_reps: ex.target_reps,
-        order_index: index,
-      }));
-
-      const { error: exercisesError } = await supabase
-        .from("routine_exercises")
-        .insert(exercisesToInsert);
-
-      if (exercisesError) throw exercisesError;
-
+    if (result.success) {
       router.push("/workouts");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create routine");
-    } finally {
+    } else {
+      setError(result.error || "Failed to create routine");
       setIsLoading(false);
     }
   };

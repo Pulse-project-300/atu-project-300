@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Dumbbell, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { deleteRoutine } from "@/app/(app)/workouts/actions";
 import type { Routine } from "@/lib/types/workouts";
 
 interface RoutineCardProps {
@@ -12,30 +11,20 @@ interface RoutineCardProps {
 }
 
 export function RoutineCard({ routine }: RoutineCardProps) {
-  const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
 
-    try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("routines")
-        .delete()
-        .eq("id", routine.id);
+    const result = await deleteRoutine(routine.id);
 
-      if (error) throw error;
-
-      router.refresh();
-    } catch (err) {
-      console.error("Failed to delete routine:", err);
-      alert("Failed to delete routine");
-    } finally {
-      setIsDeleting(false);
-      setShowConfirm(false);
+    if (!result.success) {
+      alert(result.error || "Failed to delete routine");
     }
+
+    setIsDeleting(false);
+    setShowConfirm(false);
   };
 
   return (
