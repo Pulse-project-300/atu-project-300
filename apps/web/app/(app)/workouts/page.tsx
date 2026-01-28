@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Dumbbell, Plus } from "lucide-react";
 import Link from "next/link";
 import type { Routine } from "@/lib/types/workouts";
+import { RoutineCard } from "@/components/workouts/routine-card";
 
 export default async function WorkoutsPage() {
   const supabase = await createClient();
@@ -54,30 +55,7 @@ export default async function WorkoutsPage() {
       ) : (
         <div className="grid gap-4">
           {(routines as Routine[]).map((routine) => (
-            <div
-              key={routine.id}
-              className="flex items-center justify-between rounded-lg border bg-card p-4 hover:shadow-md transition-all"
-            >
-              <div className="flex items-start gap-4">
-                <div className="rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-2.5">
-                  <Dumbbell className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium">{routine.name}</h3>
-                  {routine.description && (
-                    <p className="text-sm text-muted-foreground">{routine.description}</p>
-                  )}
-                </div>
-              </div>
-              <Link
-                href={`/workout/start/${routine.id}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-purple-500/20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 px-4 py-2 text-sm font-medium hover:from-purple-500/20 hover:to-pink-500/20 transition-all"
-              >
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Start
-                </span>
-              </Link>
-            </div>
+            <RoutineCard key={routine.id} routine={routine} />
           ))}
         </div>
       )}
