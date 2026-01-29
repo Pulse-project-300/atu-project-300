@@ -25,20 +25,20 @@ export default async function AppLayout({
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
           <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
             <div className="flex gap-5 items-center">
-              <Link href={"/dashboard"} className="text-muted-foreground hover:text-purple-600 transition-colors">
+              <Link href={"/dashboard"} className="text-muted-foreground hover:text-brand transition-colors">
                 Pulse
               </Link>
               <div className="flex gap-4 text-muted-foreground">
-                <Link href="/routines" className="hover:text-purple-600 transition-colors">
+                <Link href="/routines" className="hover:text-brand transition-colors">
                   Routines
                 </Link>
-                <Link href="/progress" className="hover:text-purple-600 transition-colors">
+                <Link href="/progress" className="hover:text-brand transition-colors">
                   Progress
                 </Link>
-                <Link href="/achievements" className="hover:text-purple-600 transition-colors">
+                <Link href="/achievements" className="hover:text-brand transition-colors">
                   Achievements
                 </Link>
-                <Link href="/ai-assistant" className="hover:text-foreground">
+                <Link href="/ai-assistant" className="hover:text-brand transition-colors">
                   AI Assistant
                 </Link>
               </div>

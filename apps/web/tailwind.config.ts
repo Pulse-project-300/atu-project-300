@@ -25,6 +25,10 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -58,8 +62,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       backgroundImage: {
-        'gradient-brand': 'linear-gradient(to right, rgb(168 85 247), rgb(236 72 153))',
-        'gradient-brand-subtle': 'linear-gradient(to right, rgb(168 85 247 / 0.1), rgb(236 72 153 / 0.1))',
+        'brand-subtle': 'rgba(59, 130, 246, 0.1)',
       },
     },
   },

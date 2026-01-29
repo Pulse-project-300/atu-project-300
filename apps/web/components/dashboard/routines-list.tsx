@@ -38,7 +38,7 @@ export function RoutinesList() {
         </div>
         <Link
           href="/routines"
-          className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+          className="text-sm text-brand hover:text-brand/80 font-medium"
         >
           View All
         </Link>
@@ -47,8 +47,8 @@ export function RoutinesList() {
       <div className="space-y-3">
         {routines.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-4 mb-4">
-              <Dumbbell className="h-8 w-8 text-purple-600" />
+            <div className="rounded-full bg-brand/10 p-4 mb-4">
+              <Dumbbell className="h-8 w-8 text-brand" />
             </div>
             <p className="text-sm font-medium text-muted-foreground mb-2">
               No routines yet
@@ -58,7 +58,7 @@ export function RoutinesList() {
             </p>
             <Link
               href="/routines/create"
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary/90 transition-all"
             >
               Create Routine
             </Link>
@@ -67,11 +67,11 @@ export function RoutinesList() {
           routines.map((routine) => (
             <div
               key={routine.id}
-              className="group flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:shadow-md hover:border-purple-500/20"
+              className="group flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:shadow-md hover:border-brand/20"
             >
               <div className="flex items-start gap-4 flex-1">
-                <div className="rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-2.5">
-                  <Dumbbell className="h-5 w-5 text-purple-600" />
+                <div className="rounded-lg bg-brand/10 p-2.5">
+                  <Dumbbell className="h-5 w-5 text-brand" />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -91,10 +91,10 @@ export function RoutinesList() {
 
               <Link
                 href={`/workout/${routine.id}`}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-purple-500/20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 px-4 py-2 text-sm font-medium shadow-sm transition-all hover:shadow-md hover:from-purple-500/20 hover:to-pink-500/20"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-brand/20 bg-brand/5 px-4 py-2 text-sm font-medium shadow-sm transition-all hover:bg-brand/10"
               >
-                <Play className="h-4 w-4 text-purple-600" />
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <Play className="h-4 w-4 text-brand" />
+                <span className="text-brand font-bold">
                   Start
                 </span>
               </Link>

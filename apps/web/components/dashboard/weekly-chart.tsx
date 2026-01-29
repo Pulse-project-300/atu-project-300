@@ -53,8 +53,8 @@ export function WeeklyChart() {
                 <div
                   className={`w-full rounded-t-xl transition-all duration-300 cursor-pointer relative ${
                     isCurrentWeek
-                      ? "bg-gradient-to-t from-purple-500 to-pink-500 shadow-xl shadow-purple-500/50"
-                      : "bg-gradient-to-t from-purple-500/70 to-pink-500/70 group-hover:from-purple-500 group-hover:to-pink-500 group-hover:shadow-xl group-hover:shadow-purple-500/30 group-hover:scale-105"
+                      ? "bg-brand shadow-xl shadow-brand/30"
+                      : "bg-muted-foreground/20 group-hover:bg-brand/70 group-hover:shadow-xl group-hover:shadow-brand/20 group-hover:scale-105"
                   }`}
                   style={{
                     height: `${heightInPx}px`,
@@ -67,8 +67,8 @@ export function WeeklyChart() {
               <div
                 className={`text-xs font-medium transition-colors whitespace-nowrap ${
                   isCurrentWeek
-                    ? "text-purple-600 font-semibold"
-                    : "text-muted-foreground group-hover:text-purple-600"
+                    ? "text-brand font-semibold"
+                    : "text-muted-foreground group-hover:text-brand"
                 }`}
               >
                 {week.week}
@@ -81,7 +81,7 @@ export function WeeklyChart() {
       {/* Legend */}
       <div className="mt-6 pt-4 border-t flex items-center justify-center gap-6 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
+          <div className="w-3 h-3 rounded-full bg-brand" />
           <span className="text-muted-foreground">Workout Hours</span>
         </div>
       </div>

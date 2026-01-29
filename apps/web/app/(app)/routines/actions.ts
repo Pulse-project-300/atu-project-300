@@ -30,7 +30,8 @@ export async function deleteRoutine(routineId: string): Promise<{ success: boole
 
 export async function createRoutine(
   name: string,
-  exercises: CreateRoutineExerciseInput[]
+  exercises: CreateRoutineExerciseInput[],
+  description?: string
 ): Promise<{ success: boolean; routineId?: string; error?: string }> {
   try {
     const supabase = await createClient();
@@ -46,6 +47,7 @@ export async function createRoutine(
       .insert({
         user_id: user.id,
         name: name.trim(),
+        description: description?.trim() || null,
       })
       .select()
       .single();
@@ -61,6 +63,8 @@ export async function createRoutine(
         target_sets: ex.target_sets,
         target_reps: ex.target_reps ?? null,
         target_weight_kg: ex.target_weight_kg ?? null,
+        rest_seconds: ex.rest_seconds ?? 60,
+        notes: ex.notes ?? null,
         order_index: index,
       }));
 

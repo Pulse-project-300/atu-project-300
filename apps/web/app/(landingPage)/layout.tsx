@@ -12,7 +12,7 @@ export default function MarketingLayout({
       <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center">
-            <Link href={"/"} className="text-muted-foreground hover:text-purple-600 transition-colors">Pulse</Link>
+            <Link href={"/"} className="text-muted-foreground hover:text-brand transition-colors">Pulse</Link>
           </div>
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
