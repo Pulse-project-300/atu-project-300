@@ -59,7 +59,8 @@ export async function createRoutine(
         exercise_library_id: ex.exercise_library_id || null,
         exercise_name: ex.exercise_name,
         target_sets: ex.target_sets,
-        target_reps: ex.target_reps,
+        target_reps: ex.target_reps ?? null,
+        target_weight_kg: ex.target_weight_kg ?? null,
         order_index: index,
       }));
 

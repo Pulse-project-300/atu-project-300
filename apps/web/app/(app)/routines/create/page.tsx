@@ -2,13 +2,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Save, X, Search, Dumbbell } from "lucide-react";
+import { ArrowLeft, Plus, Save, X, Search, Dumbbell, Minus } from "lucide-react";
 import Link from "next/link";
 import { createRoutine, searchExercises } from "@/app/(app)/routines/actions";
-import type { CreateRoutineExerciseInput, ExerciseLibraryItem } from "@/lib/types/routines";
+import type { ExerciseLibraryItem, SetInput } from "@/lib/types/routines";
 
-interface ExerciseEntry extends CreateRoutineExerciseInput {
-  id: string; // temporary client-side ID for React keys
+interface ExerciseEntry {
+  id: string;
+  exercise_library_id?: string;
+  exercise_name: string;
+  sets: SetInput[];
 }
 
 export default function CreateRoutinePage() {
@@ -48,13 +51,20 @@ export default function CreateRoutinePage() {
     }
   }, [showExerciseSearch]);
 
+  const createDefaultSets = (count: number = 3): SetInput[] => {
+    return Array.from({ length: count }, () => ({
+      id: crypto.randomUUID(),
+      weight_kg: null,
+      reps: null,
+    }));
+  };
+
   const addExerciseFromLibrary = (libraryExercise: ExerciseLibraryItem) => {
     const newExercise: ExerciseEntry = {
       id: crypto.randomUUID(),
       exercise_library_id: libraryExercise.rowid,
       exercise_name: libraryExercise.name || "Unknown Exercise",
-      target_sets: 3,
-      target_reps: 10,
+      sets: createDefaultSets(3),
     };
 
     setExercises([...exercises, newExercise]);
@@ -69,8 +79,7 @@ export default function CreateRoutinePage() {
     const newExercise: ExerciseEntry = {
       id: crypto.randomUUID(),
       exercise_name: searchQuery.trim(),
-      target_sets: 3,
-      target_reps: 10,
+      sets: createDefaultSets(3),
     };
 
     setExercises([...exercises, newExercise]);
@@ -79,9 +88,32 @@ export default function CreateRoutinePage() {
     setShowExerciseSearch(false);
   };
 
-  const updateExercise = (id: string, updates: Partial<ExerciseEntry>) => {
+  const addSetToExercise = (exerciseId: string) => {
     setExercises(exercises.map(ex =>
-      ex.id === id ? { ...ex, ...updates } : ex
+      ex.id === exerciseId
+        ? { ...ex, sets: [...ex.sets, { id: crypto.randomUUID(), weight_kg: null, reps: null }] }
+        : ex
+    ));
+  };
+
+  const removeSetFromExercise = (exerciseId: string, setId: string) => {
+    setExercises(exercises.map(ex =>
+      ex.id === exerciseId
+        ? { ...ex, sets: ex.sets.filter(s => s.id !== setId) }
+        : ex
+    ));
+  };
+
+  const updateSet = (exerciseId: string, setId: string, updates: Partial<SetInput>) => {
+    setExercises(exercises.map(ex =>
+      ex.id === exerciseId
+        ? {
+            ...ex,
+            sets: ex.sets.map(s =>
+              s.id === setId ? { ...s, ...updates } : s
+            ),
+          }
+        : ex
     ));
   };
 
@@ -102,10 +134,28 @@ export default function CreateRoutinePage() {
       return;
     }
 
+    // Check that all exercises have at least one set
+    const exerciseWithNoSets = exercises.find(ex => ex.sets.length === 0);
+    if (exerciseWithNoSets) {
+      setError(`"${exerciseWithNoSets.exercise_name}" needs at least one set`);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
-    const result = await createRoutine(name.trim(), exercises);
+    // Transform to the format expected by createRoutine
+    const exercisesForApi = exercises.map(ex => ({
+      exercise_library_id: ex.exercise_library_id,
+      exercise_name: ex.exercise_name,
+      target_sets: ex.sets.length,
+      // Use the first set's values as defaults (or average them)
+      target_reps: ex.sets[0]?.reps ?? undefined,
+      target_weight_kg: ex.sets[0]?.weight_kg ?? undefined,
+      sets: ex.sets, // Pass the full sets array
+    }));
+
+    const result = await createRoutine(name.trim(), exercisesForApi);
 
     if (result.success) {
       router.push("/routines");
@@ -156,53 +206,92 @@ export default function CreateRoutinePage() {
       )}
 
       {/* Exercise List */}
-      <div className="flex flex-col gap-3">
-        {exercises.map((exercise, index) => (
+      <div className="flex flex-col gap-4">
+        {exercises.map((exercise) => (
           <div
             key={exercise.id}
-            className="flex items-center gap-3 p-4 rounded-lg border bg-card"
+            className="rounded-lg border bg-card overflow-hidden"
           >
-            
-
-            <div className="flex-1">
-              <div className="font-medium">{exercise.exercise_name}</div>
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-2">
-                  <label className="text-xs text-muted-foreground">Sets</label>
-                  <input
-                    type="number"
-                    value={exercise.target_sets}
-                    onChange={(e) => updateExercise(exercise.id, {
-                      target_sets: parseInt(e.target.value) || 1
-                    })}
-                    min={1}
-                    max={20}
-                    className="w-16 px-2 py-1 rounded border bg-background text-center text-sm"
-                  />
+            {/* Exercise Header */}
+            <div className="flex items-center justify-between p-4 border-b bg-muted/30">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-2">
+                  <Dumbbell className="h-4 w-4 text-purple-600" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <label className="text-xs text-muted-foreground">Reps</label>
-                  <input
-                    type="number"
-                    value={exercise.target_reps || ""}
-                    onChange={(e) => updateExercise(exercise.id, {
-                      target_reps: parseInt(e.target.value) || undefined
-                    })}
-                    min={1}
-                    max={100}
-                    placeholder="-"
-                    className="w-16 px-2 py-1 rounded border bg-background text-center text-sm"
-                  />
-                </div>
+                <span className="font-medium">{exercise.exercise_name}</span>
               </div>
+              <button
+                onClick={() => removeExercise(exercise.id)}
+                className="p-2 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"
+                title="Remove exercise"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
-            <button
-              onClick={() => removeExercise(exercise.id)}
-              className="p-2 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            {/* Sets Table */}
+            <div className="p-4">
+              {/* Header Row */}
+              <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-3 mb-2 px-1">
+                <div className="w-8 text-xs font-medium text-muted-foreground text-center">Set</div>
+                <div className="text-xs font-medium text-muted-foreground">Weight (kg)</div>
+                <div className="text-xs font-medium text-muted-foreground">Reps</div>
+                <div className="w-8"></div>
+              </div>
+
+              {/* Set Rows */}
+              <div className="flex flex-col gap-2">
+                {exercise.sets.map((set, setIndex) => (
+                  <div
+                    key={set.id}
+                    className="grid grid-cols-[auto_1fr_1fr_auto] gap-3 items-center"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
+                      {setIndex + 1}
+                    </div>
+                    <input
+                      type="number"
+                      value={set.weight_kg ?? ""}
+                      onChange={(e) => updateSet(exercise.id, set.id, {
+                        weight_kg: e.target.value ? parseFloat(e.target.value) : null
+                      })}
+                      placeholder="0"
+                      min={0}
+                      step={0.5}
+                      className="px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <input
+                      type="number"
+                      value={set.reps ?? ""}
+                      onChange={(e) => updateSet(exercise.id, set.id, {
+                        reps: e.target.value ? parseInt(e.target.value) : null
+                      })}
+                      placeholder="0"
+                      min={1}
+                      max={100}
+                      className="px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <button
+                      onClick={() => removeSetFromExercise(exercise.id, set.id)}
+                      disabled={exercise.sets.length <= 1}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                      title="Remove set"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add Set Button */}
+              <button
+                onClick={() => addSetToExercise(exercise.id)}
+                className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-dashed hover:border-purple-500 hover:bg-purple-50/50 text-sm text-muted-foreground hover:text-purple-600 transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                Add Set
+              </button>
+            </div>
           </div>
         ))}
 

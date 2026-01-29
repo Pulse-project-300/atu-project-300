@@ -92,6 +92,20 @@ export interface CreateRoutineExerciseInput {
   notes?: string;
 }
 
+export interface SetInput {
+  id: string;
+  weight_kg: number | null;
+  reps: number | null;
+}
+
+export interface CreateRoutineExerciseWithSetsInput {
+  exercise_library_id?: string;
+  exercise_name: string;
+  sets: SetInput[];
+  rest_seconds?: number;
+  notes?: string;
+}
+
 export interface StartWorkoutInput {
   routine_id?: string;
   name: string;
