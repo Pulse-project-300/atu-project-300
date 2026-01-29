@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { Dumbbell, Plus } from "lucide-react";
 import Link from "next/link";
-import type { Routine } from "@/lib/types/workouts";
-import { RoutineCard } from "@/components/workouts/routine-card";
+import type { Routine } from "@/lib/types/routines";
+import { RoutineCard } from "@/components/routines/routine-card";
 
-export default async function WorkoutsPage() {
+export default async function RoutinesPage() {
   const supabase = await createClient();
 
   const { data: routines, error } = await supabase

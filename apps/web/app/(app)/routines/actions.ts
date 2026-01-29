@@ -7,7 +7,7 @@ import type {
   RoutineWithExercises,
   CreateRoutineExerciseInput,
   ExerciseLibraryItem
-} from "@/lib/types/workouts";
+} from "@/lib/types/routines";
 
 export async function deleteRoutine(routineId: string): Promise<{ success: boolean; error?: string }> {
   try {
@@ -20,7 +20,7 @@ export async function deleteRoutine(routineId: string): Promise<{ success: boole
 
     if (error) throw error;
 
-    revalidatePath("/workouts");
+    revalidatePath("/routines");
     return { success: true };
   } catch (err) {
     console.error("Failed to delete routine:", err);
@@ -70,7 +70,7 @@ export async function createRoutine(
       if (exercisesError) throw exercisesError;
     }
 
-    revalidatePath("/workouts");
+    revalidatePath("/routines");
     return { success: true, routineId: routine.id };
   } catch (err) {
     console.error("Failed to create routine:", err);

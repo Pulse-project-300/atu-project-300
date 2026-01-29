@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Save, X, Search, Dumbbell } from "lucide-react";
 import Link from "next/link";
-import { createRoutine, searchExercises } from "@/app/(app)/workouts/actions";
-import type { CreateRoutineExerciseInput, ExerciseLibraryItem } from "@/lib/types/workouts";
+import { createRoutine, searchExercises } from "@/app/(app)/routines/actions";
+import type { CreateRoutineExerciseInput, ExerciseLibraryItem } from "@/lib/types/routines";
 
 interface ExerciseEntry extends CreateRoutineExerciseInput {
   id: string; // temporary client-side ID for React keys
@@ -108,7 +108,7 @@ export default function CreateRoutinePage() {
     const result = await createRoutine(name.trim(), exercises);
 
     if (result.success) {
-      router.push("/workouts");
+      router.push("/routines");
     } else {
       setError(result.error || "Failed to create routine");
       setIsLoading(false);
@@ -121,7 +121,7 @@ export default function CreateRoutinePage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link
-            href="/workouts"
+            href="/routines"
             className="p-2 rounded-lg hover:bg-muted transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />

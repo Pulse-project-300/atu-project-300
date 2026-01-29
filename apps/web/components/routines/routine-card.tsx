@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Dumbbell, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { deleteRoutine } from "@/app/(app)/workouts/actions";
-import type { Routine } from "@/lib/types/workouts";
+import { deleteRoutine } from "@/app/(app)/routines/actions";
+import type { Routine } from "@/lib/types/routines";
 
 interface RoutineCardProps {
   routine: Routine;
@@ -70,7 +70,7 @@ export function RoutineCard({ routine }: RoutineCardProps) {
               <Trash2 className="h-4 w-4" />
             </button>
             <Link
-              href={`/workout/start/${routine.id}`}
+              href={`/workouts/start/${routine.id}`}
               className="inline-flex items-center gap-2 rounded-lg border border-purple-500/20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 px-4 py-2 text-sm font-medium hover:from-purple-500/20 hover:to-pink-500/20 transition-all"
             >
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">

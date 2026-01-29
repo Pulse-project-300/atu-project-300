@@ -29,7 +29,7 @@ export default async function AppLayout({
                 Pulse
               </Link>
               <div className="flex gap-4 text-muted-foreground">
-                <Link href="/workouts" className="hover:text-purple-600 transition-colors">
+                <Link href="/routines" className="hover:text-purple-600 transition-colors">
                   Routines
                 </Link>
                 <Link href="/progress" className="hover:text-purple-600 transition-colors">
