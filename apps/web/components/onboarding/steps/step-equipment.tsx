@@ -2,6 +2,7 @@
 
 import { OnboardingData } from "@/lib/onboarding/types";
 import { EQUIPMENT_OPTIONS } from "@/lib/onboarding/constants";
+import { cn } from "@/lib/utils";
 
 interface StepEquipmentProps {
   data: OnboardingData;

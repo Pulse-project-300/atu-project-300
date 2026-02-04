@@ -130,4 +130,38 @@ export interface ExerciseGroup {
   exercise_name: string;
   exercise_library_id: string | null;
   sets: WorkoutSet[];
+  rest_seconds?: number;
+  notes?: string | null;
+  order_index: number;
+}
+
+// Rest Timer State
+export interface RestTimerState {
+  isActive: boolean;
+  remainingSeconds: number;
+  totalSeconds: number;
+  exerciseName: string;
+}
+
+// Full Workout Context State
+export interface WorkoutContextState {
+  activeWorkout: ActiveWorkoutState | null;
+  isExpanded: boolean;
+  isLoading: boolean;
+  restTimer: RestTimerState | null;
+}
+
+// Workout Context Actions
+export interface WorkoutContextActions {
+  startWorkout: (routineId: string) => Promise<void>;
+  completeSet: (setId: string, weight_kg?: number, reps?: number) => Promise<void>;
+  updateSet: (setId: string, data: UpdateSetInput) => Promise<void>;
+  addSet: (exerciseName: string, exerciseLibraryId?: string | null) => Promise<void>;
+  finishWorkout: () => Promise<void>;
+  cancelWorkout: () => Promise<void>;
+  toggleExpanded: () => void;
+  expand: () => void;
+  minimize: () => void;
+  startRestTimer: (seconds: number, exerciseName: string) => void;
+  skipRestTimer: () => void;
 }

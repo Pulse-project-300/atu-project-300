@@ -2,6 +2,7 @@
 
 import { OnboardingData } from "@/lib/onboarding/types";
 import { EXPERIENCE_LEVELS } from "@/lib/onboarding/constants";
+import { cn } from "@/lib/utils";
 
 interface StepExperienceProps {
   data: OnboardingData;

@@ -426,7 +426,6 @@ export default function CreateRoutinePage() {
               </CardContent>
             </Card>
           ))}
-
           {/* Add Exercise */}
           <div className="mt-4 flex flex-col gap-4">
             {showExerciseSearch ? (
@@ -439,7 +438,7 @@ export default function CreateRoutinePage() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search 1000+ exercises..."
+                      placeholder="Search 200+ exercises..."
                       className="flex-1 bg-transparent border-none focus:outline-none text-lg font-bold placeholder:text-muted-foreground/40"
                     />
                     <Button
@@ -508,7 +507,7 @@ export default function CreateRoutinePage() {
               <div className="space-y-4">
                 <Button
                   onClick={() => setShowExerciseSearch(true)}
-                  className="w-full h-16 rounded-2xl bg-brand hover:bg-brand/90 text-white font-black text-xl shadow-xl shadow-brand/10 active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full h-12 rounded-2xl bg-brand hover:bg-brand/90 text-white font-black text-xl shadow-xl shadow-brand/10 active:scale-95 transition-all flex items-center justify-center gap-3"
                 >
                   <Plus className="h-7 w-7 stroke-[3px]" />
                   Add Exercise
@@ -516,7 +515,7 @@ export default function CreateRoutinePage() {
                 
                 <Button
                   variant="ghost"
-                  className="w-full h-14 rounded-2xl text-muted-foreground hover:text-destructive hover:bg-destructive/5 font-bold transition-all border-2 border-dashed border-muted-foreground/10"
+                  className="w-full h-12 rounded-2xl text-muted-foreground hover:text-destructive hover:bg-destructive/5 font-bold transition-all border-2 border-dashed border-muted-foreground/10"
                   onClick={() => {
                     if (confirm("Are you sure? This will discard all changes to this routine.")) {
                       router.push("/routines");
