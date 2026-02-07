@@ -45,8 +45,8 @@ export function Nav({ authButton }: NavProps) {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "hover:text-brand transition-colors",
-                      isActive && "text-brand font-medium"
+                      "hover:text-primary transition-colors",
+                      isActive && "text-primary font-medium"
                     )}
                   >
                     {item.label}
@@ -64,7 +64,7 @@ export function Nav({ authButton }: NavProps) {
 
       {/* Mobile: Top header (minimal) */}
       <header className="md:hidden w-full flex justify-between items-center p-4 border-b border-b-foreground/10">
-        <Link href="/dashboard" className="font-bold text-lg text-brand">
+        <Link href="/dashboard" className="font-bold text-lg text-primary">
           Pulse
         </Link>
         <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ export function Nav({ authButton }: NavProps) {
                 className={cn(
                   "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all min-w-[4rem]",
                   isActive
-                    ? "text-brand"
+                    ? "text-primary"
                     : "text-muted-foreground"
                 )}
               >

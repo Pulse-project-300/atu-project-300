@@ -23,8 +23,8 @@ export function AIChatWidget() {
           className="w-full p-6 text-left hover:bg-accent/50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="rounded-full bg-brand/5 p-2.5">
-              <Sparkles className="h-5 w-5 text-brand" />
+            <div className="rounded-full bg-primary/5 p-2.5">
+              <Sparkles className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-semibold flex items-center gap-2">
@@ -49,8 +49,8 @@ export function AIChatWidget() {
       <div className="border-b p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-full bg-brand/5 p-2">
-              <Sparkles className="h-4 w-4 text-brand" />
+            <div className="rounded-full bg-primary/5 p-2">
+              <Sparkles className="h-4 w-4 text-primary" />
             </div>
             <div>
               <h3 className="text-sm font-semibold">AI Workout Assistant</h3>
@@ -72,8 +72,8 @@ export function AIChatWidget() {
         <div className="space-y-4">
           {/* Welcome message */}
           <div className="flex gap-3">
-            <div className="rounded-full bg-brand/5 p-1.5 h-fit">
-              <Sparkles className="h-3 w-3 text-brand" />
+            <div className="rounded-full bg-primary/5 p-1.5 h-fit">
+              <Sparkles className="h-3 w-3 text-primary" />
             </div>
             <div className="flex-1 rounded-lg bg-muted/50 p-3">
               <p className="text-sm">
@@ -96,7 +96,7 @@ export function AIChatWidget() {
                 <button
                   key={prompt}
                   onClick={() => setMessage(prompt)}
-                  className="text-left text-xs rounded-md border border-border bg-background px-3 py-2 hover:bg-brand/5 hover:border-brand/20 transition-all"
+                  className="text-left text-xs rounded-md border border-border bg-background px-3 py-2 hover:bg-primary/5 hover:border-primary/20 transition-all"
                 >
                   {prompt}
                 </button>
@@ -119,7 +119,7 @@ export function AIChatWidget() {
               }
             }}
             placeholder="Ask me anything..."
-            className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
           <button
             onClick={handleSend}

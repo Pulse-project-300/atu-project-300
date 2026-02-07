@@ -256,7 +256,7 @@ export default function CreateRoutinePage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Routine Title"
-            className="text-4xl font-black bg-transparent border-none focus:outline-none placeholder:text-muted-foreground/20 selection:bg-brand/20"
+            className="text-4xl font-black bg-transparent border-none focus:outline-none placeholder:text-muted-foreground/20 selection:bg-primary/20"
             disabled={isLoading}
           />
           <textarea
@@ -300,14 +300,14 @@ export default function CreateRoutinePage() {
                       className={cn(
                         "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors",
                         exercise.notes || exercise.showNotes
-                          ? "text-brand"
-                          : "text-muted-foreground hover:text-brand",
+                          ? "text-primary"
+                          : "text-muted-foreground hover:text-primary",
                       )}
                     >
                       <MessageSquare className="h-3.5 w-3.5" />
                       {exercise.notes ? "Edit Note" : "Add Note"}
                     </button>
-                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-brand transition-colors">
+                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors">
                       <Clock className="h-3.5 w-3.5" />
                       <select
                         value={exercise.rest_seconds}
@@ -356,7 +356,7 @@ export default function CreateRoutinePage() {
                         updateExercise(exercise.id, { notes: e.target.value })
                       }
                       placeholder="Special instructions or tips..."
-                      className="w-full text-sm p-4 rounded-xl bg-muted/40 border-none focus:ring-2 focus:ring-brand/20 resize-none min-h-[80px]"
+                      className="w-full text-sm p-4 rounded-xl bg-muted/40 border-none focus:ring-2 focus:ring-primary/20 resize-none min-h-[80px]"
                       autoFocus
                     />
                   </div>
@@ -378,7 +378,7 @@ export default function CreateRoutinePage() {
                         className="grid grid-cols-[3.5rem_1fr_1fr_3.5rem] gap-3 items-center group animate-in fade-in slide-in-from-left-2"
                       >
                         <div className="flex items-center justify-center">
-                          <div className="h-7 w-9 flex items-center justify-center rounded-lg font-black text-xs bg-muted/60 text-muted-foreground group-hover:bg-brand/10 group-hover:text-brand transition-colors">
+                          <div className="h-7 w-9 flex items-center justify-center rounded-lg font-black text-xs bg-muted/60 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                             {setIndex + 1}
                           </div>
                         </div>
@@ -391,7 +391,7 @@ export default function CreateRoutinePage() {
                             })
                           }
                           placeholder="0"
-                          className="h-11 text-center bg-muted/30 border-none font-black text-base rounded-xl focus:ring-2 focus:ring-brand/20"
+                          className="h-11 text-center bg-muted/30 border-none font-black text-base rounded-xl focus:ring-2 focus:ring-primary/20"
                         />
                         <Input
                           type="number"
@@ -402,7 +402,7 @@ export default function CreateRoutinePage() {
                             })
                           }
                           placeholder="0"
-                          className="h-11 text-center bg-muted/30 border-none font-black text-base rounded-xl focus:ring-2 focus:ring-brand/20"
+                          className="h-11 text-center bg-muted/30 border-none font-black text-base rounded-xl focus:ring-2 focus:ring-primary/20"
                         />
                         <div className="flex justify-center">
                           <Button
@@ -421,7 +421,7 @@ export default function CreateRoutinePage() {
 
                   <Button
                     variant="secondary"
-                    className="w-full h-11 text-sm font-black uppercase tracking-widest rounded-xl bg-muted/40 hover:bg-muted text-muted-foreground hover:text-brand transition-all mt-2"
+                    className="w-full h-11 text-sm font-black uppercase tracking-widest rounded-xl bg-muted/40 hover:bg-muted text-muted-foreground hover:text-primary transition-all mt-2"
                     onClick={() => addSetToExercise(exercise.id)}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -459,7 +459,7 @@ export default function CreateRoutinePage() {
                 <div className="max-h-[400px] overflow-y-auto">
                   {isSearching ? (
                     <div className="p-12 flex flex-col items-center justify-center gap-3 text-muted-foreground font-bold italic">
-                      <div className="h-8 w-8 border-4 border-border border-t-brand rounded-full animate-spin" />
+                      <div className="h-8 w-8 border-4 border-border border-t-primary rounded-full animate-spin" />
                       Searching...
                     </div>
                   ) : searchResults.length > 0 ? (
@@ -470,11 +470,11 @@ export default function CreateRoutinePage() {
                           onClick={() => addExerciseFromLibrary(exercise)}
                           className="w-full flex items-center gap-4 p-5 hover:bg-muted transition-all text-left group"
                         >
-                          <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-brand/10 group-hover:scale-110 transition-all">
-                            <Dumbbell className="h-6 w-6 text-muted-foreground group-hover:text-brand" />
+                          <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-primary/10 group-hover:scale-110 transition-all">
+                            <Dumbbell className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-black text-base uppercase tracking-tight group-hover:text-brand transition-colors">
+                            <div className="font-black text-base uppercase tracking-tight group-hover:text-primary transition-colors">
                               {exercise.name}
                             </div>
                             <div className="text-xs font-black text-muted-foreground/60 uppercase tracking-widest mt-0.5">
@@ -483,7 +483,7 @@ export default function CreateRoutinePage() {
                                 .join(" • ")}
                             </div>
                           </div>
-                          <Plus className="h-6 w-6 text-muted-foreground/20 group-hover:text-brand transition-colors" />
+                          <Plus className="h-6 w-6 text-muted-foreground/20 group-hover:text-primary transition-colors" />
                         </button>
                       ))}
                     </div>
@@ -512,7 +512,7 @@ export default function CreateRoutinePage() {
               <div className="space-y-4">
                 <Button
                   onClick={() => setShowExerciseSearch(true)}
-                  className="w-full h-12 rounded-2xl bg-brand hover:bg-brand/90 text-white font-black text-xl shadow-xl shadow-brand/10 active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-xl shadow-primary/10 active:scale-95 transition-all flex items-center justify-center gap-3"
                 >
                   <Plus className="h-7 w-7 stroke-[3px]" />
                   Add Exercise

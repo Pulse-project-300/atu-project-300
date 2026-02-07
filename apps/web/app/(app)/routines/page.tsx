@@ -37,8 +37,8 @@ export default async function RoutinesPage() {
         </div>
       ) : !routines || routines.length === 0 ? (
         <div className="p-12 border rounded-lg text-center">
-          <div className="rounded-full bg-brand/5 p-4 mb-4 inline-block">
-            <Dumbbell className="h-8 w-8 text-brand" />
+          <div className="rounded-full bg-primary/5 p-4 mb-4 inline-block">
+            <Dumbbell className="h-8 w-8 text-primary" />
           </div>
           <h3 className="text-lg font-medium mb-2">No routines yet</h3>
           <p className="text-muted-foreground mb-4">

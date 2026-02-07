@@ -69,8 +69,8 @@ export function WorkoutModal() {
       >
         <div className="mx-4 mb-4 bg-card border rounded-2xl shadow-2xl p-4 flex items-center justify-between gap-4 animate-in slide-in-from-bottom-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-brand/10 flex items-center justify-center">
-              <Dumbbell className="h-5 w-5 text-brand" />
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Dumbbell className="h-5 w-5 text-primary" />
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-sm line-clamp-1">{currentExercise}</span>
@@ -82,7 +82,7 @@ export function WorkoutModal() {
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 bg-muted/50 px-3 py-1.5 rounded-lg">
-              <Clock className="h-4 w-4 text-brand" />
+              <Clock className="h-4 w-4 text-primary" />
               <span className="font-mono font-bold text-sm">
                 {formatTime(activeWorkout.elapsedSeconds)}
               </span>
@@ -165,7 +165,7 @@ export function WorkoutModal() {
                 <Button
                   variant="default"
                   size="sm"
-                  className="h-8 bg-brand hover:bg-brand/90"
+                  className="h-8 bg-primary hover:bg-primary/90"
                   onClick={() => {
                     finishWorkout();
                     setShowFinishConfirm(false);
@@ -196,7 +196,7 @@ export function WorkoutModal() {
                 <Button
                   variant="default"
                   size="sm"
-                  className="bg-brand hover:bg-brand/90 font-bold"
+                  className="bg-primary hover:bg-primary/90 font-bold"
                   onClick={() => setShowFinishConfirm(true)}
                 >
                   Finish
@@ -319,8 +319,8 @@ function ExerciseCard({
       <CardHeader className="p-5 pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-brand/10 flex items-center justify-center">
-              <Dumbbell className="h-4 w-4 text-brand" />
+            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Dumbbell className="h-4 w-4 text-primary" />
             </div>
             {group.exercise_name}
           </CardTitle>
@@ -361,7 +361,7 @@ function ExerciseCard({
                   className={cn(
                     "h-7 w-7 flex items-center justify-center rounded-lg font-bold text-xs transition-all",
                     set.completed
-                      ? "bg-brand text-white"
+                      ? "bg-primary text-white"
                       : "bg-muted/60 text-muted-foreground"
                   )}
                 >
@@ -378,7 +378,7 @@ function ExerciseCard({
                 onBlur={() => handleInputBlur(set, "weight")}
                 placeholder="0"
                 className={cn(
-                  "h-11 text-center bg-muted/30 border-none font-bold text-base rounded-xl focus:ring-2 focus:ring-brand/20",
+                  "h-11 text-center bg-muted/30 border-none font-bold text-base rounded-xl focus:ring-2 focus:ring-primary/20",
                   set.completed && "line-through"
                 )}
                 disabled={set.completed}
@@ -393,7 +393,7 @@ function ExerciseCard({
                 onBlur={() => handleInputBlur(set, "reps")}
                 placeholder="0"
                 className={cn(
-                  "h-11 text-center bg-muted/30 border-none font-bold text-base rounded-xl focus:ring-2 focus:ring-brand/20",
+                  "h-11 text-center bg-muted/30 border-none font-bold text-base rounded-xl focus:ring-2 focus:ring-primary/20",
                   set.completed && "line-through"
                 )}
                 disabled={set.completed}
@@ -408,8 +408,8 @@ function ExerciseCard({
                   className={cn(
                     "h-11 w-11 rounded-xl transition-all",
                     set.completed
-                      ? "bg-brand text-white hover:bg-brand/80"
-                      : "bg-muted/30 hover:bg-brand/10 hover:text-brand"
+                      ? "bg-primary text-white hover:bg-primary/80"
+                      : "bg-muted/30 hover:bg-primary/10 hover:text-primary"
                   )}
                 >
                   <Check className="h-5 w-5" />
@@ -422,7 +422,7 @@ function ExerciseCard({
         {/* Add Set Button */}
         <Button
           variant="ghost"
-          className="w-full h-10 text-sm font-bold text-muted-foreground hover:text-brand hover:bg-brand/5 rounded-xl mt-4 border-2 border-dashed border-muted-foreground/10"
+          className="w-full h-10 text-sm font-bold text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl mt-4 border-2 border-dashed border-muted-foreground/10"
           onClick={() => onAddSet(group.exercise_name, group.exercise_library_id)}
         >
           <Plus className="h-4 w-4 mr-2" />

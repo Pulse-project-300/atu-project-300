@@ -102,7 +102,7 @@ export function RoutineCard({ routine }: RoutineCardProps) {
             <button
               onClick={handleStartOrContinueWorkout}
               disabled={isStarting || (hasActiveWorkout && !isThisRoutineActive)}
-              className="inline-flex items-center gap-2 rounded-lg border border-brand/20 bg-brand/5 px-4 py-2 text-sm font-medium hover:bg-brand/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium hover:bg-primary/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               title={
                 isThisRoutineActive 
                   ? "Continue this workout" 
@@ -112,11 +112,11 @@ export function RoutineCard({ routine }: RoutineCardProps) {
               }
             >
               {isStarting ? (
-                <Loader2 className="h-4 w-4 text-brand animate-spin" />
+                <Loader2 className="h-4 w-4 text-primary animate-spin" />
               ) : (
-                <Play className="h-4 w-4 text-brand" />
+                <Play className="h-4 w-4 text-primary" />
               )}
-              <span className="text-brand font-bold">
+              <span className="text-primary font-bold">
                 {isThisRoutineActive ? "Continue" : hasActiveWorkout ? "In Progress" : "Start"}
               </span>
             </button>

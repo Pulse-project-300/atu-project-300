@@ -30,7 +30,7 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
                 "w-full text-left transition-all border-2 rounded-xl",
                 isSelected
                   ? "p-4 border-primary bg-primary text-white shadow-md shadow-primary/10"
-                  : "p-4 border-border bg-card hover:border-brand/30 text-foreground"
+                  : "p-4 border-border bg-card hover:border-primary/30 text-foreground"
               )}
             >
               <div className="font-bold">{level.label}</div>

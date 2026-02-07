@@ -69,8 +69,8 @@ export default function Page() {
           <div className="rounded-lg border bg-card shadow-sm">
             <div className="border-b p-4">
               <div className="flex items-center gap-3">
-                <div className="rounded-full bg-brand/10 p-2">
-                  <Dumbbell className="h-4 w-4 text-brand" />
+                <div className="rounded-full bg-primary/10 p-2">
+                  <Dumbbell className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold">Your Workout Plan</h3>
@@ -131,8 +131,8 @@ export default function Page() {
             <div className="rounded-lg border bg-card shadow-sm">
               <div className="border-b p-4">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-brand/10 p-2">
-                    <Sparkles className="h-4 w-4 text-brand" />
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold">AI Explanation</h3>
@@ -169,7 +169,7 @@ export default function Page() {
       {/* Info Section */}
       <div className="rounded-lg border bg-muted/20 p-6">
         <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-brand" />
+          <Sparkles className="h-4 w-4 text-primary" />
           About AI-Powered Explanations
         </h3>
         <p className="text-sm text-muted-foreground leading-relaxed">

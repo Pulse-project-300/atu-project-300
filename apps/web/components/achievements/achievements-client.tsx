@@ -185,10 +185,10 @@ interface BadgeWithEarnedStatus {
         </div>
 
         {/*testing panel*/}
-        <Card className="border-brand/10 bg-brand/[0.02]">
+        <Card className="border-primary/10 bg-primary/[0.02]">
             <CardHeader>
             <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-brand" />
+                <Trophy className="h-5 w-5 text-primary" />
                 Demo Testing Panel
             </CardTitle>
             <CardDescription>

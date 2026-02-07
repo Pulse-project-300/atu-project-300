@@ -53,8 +53,8 @@ export function WeeklyChart() {
                 <div
                   className={`w-full rounded-t-xl transition-all duration-300 cursor-pointer relative ${
                     isCurrentWeek
-                      ? "bg-brand shadow-xl shadow-brand/30"
-                      : "bg-muted-foreground/20 group-hover:bg-brand/70 group-hover:shadow-xl group-hover:shadow-brand/20 group-hover:scale-105"
+                      ? "bg-primary shadow-xl shadow-primary/30"
+                      : "bg-muted-foreground/20 group-hover:bg-primary/70 group-hover:shadow-xl group-hover:shadow-primary/20 group-hover:scale-105"
                   }`}
                   style={{
                     height: `${heightInPx}px`,
@@ -67,8 +67,8 @@ export function WeeklyChart() {
               <div
                 className={`text-xs font-medium transition-colors whitespace-nowrap ${
                   isCurrentWeek
-                    ? "text-brand font-semibold"
-                    : "text-muted-foreground group-hover:text-brand"
+                    ? "text-primary font-semibold"
+                    : "text-muted-foreground group-hover:text-primary"
                 }`}
               >
                 {week.week}
@@ -81,7 +81,7 @@ export function WeeklyChart() {
       {/* Legend */}
       <div className="mt-6 pt-4 border-t flex items-center justify-center gap-6 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-brand" />
+          <div className="w-3 h-3 rounded-full bg-primary" />
           <span className="text-muted-foreground">Workout Hours</span>
         </div>
       </div>

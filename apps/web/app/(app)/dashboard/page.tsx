@@ -27,7 +27,7 @@ export default async function DashboardPage() {
       {/* Welcome Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">
-          Welcome back, <span className="text-brand">{displayName}</span>!
+          Welcome back, <span className="text-primary">{displayName}</span>!
         </h1>
         <p className="text-muted-foreground">
           Here's your fitness overview and quick actions

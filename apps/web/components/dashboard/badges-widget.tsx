@@ -84,7 +84,7 @@ export function BadgesWidget() {
                     {earnedBadges.map((badge) => (
                     <div
                         key={badge.id}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-brand/5 transition-colors"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors"
                     >
                         <div className="text-2xl">{badge.icon}</div>
                         <div className="flex-1 min-w-0">
@@ -96,7 +96,7 @@ export function BadgesWidget() {
                                 new Date(badge.earned_at).toLocaleDateString()}
                             </div>
                         </div>
-                        <Award className="h-4 w-4 text-brand/40" />
+                        <Award className="h-4 w-4 text-primary/40" />
                     </div>
                     ))}
                 </div>
