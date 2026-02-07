@@ -62,7 +62,7 @@ export function BadgesWidget() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div>
                     <CardTitle className="flex items-center gap-2">
-                        <Trophy className="h-5 w-5 text-purple-600" />
+                        <Trophy className="h-5 w-5 text-primary" />
                         Achievements
                     </CardTitle>
                     <CardDescription>
@@ -84,7 +84,7 @@ export function BadgesWidget() {
                     {earnedBadges.map((badge) => (
                     <div
                         key={badge.id}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors"
                     >
                         <div className="text-2xl">{badge.icon}</div>
                         <div className="flex-1 min-w-0">
@@ -96,7 +96,7 @@ export function BadgesWidget() {
                                 new Date(badge.earned_at).toLocaleDateString()}
                             </div>
                         </div>
-                        <Award className="h-4 w-4 text-green-600" />
+                        <Award className="h-4 w-4 text-primary/40" />
                     </div>
                     ))}
                 </div>

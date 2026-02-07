@@ -15,7 +15,7 @@ export function ProgressIndicator({ currentStep, totalSteps }: ProgressIndicator
       </div>
       <div className="h-1 bg-border rounded-full overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
+          className="h-full bg-primary transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>

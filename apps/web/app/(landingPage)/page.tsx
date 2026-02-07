@@ -13,7 +13,7 @@ export default async function Home() {
       <div className="flex-1 flex flex-col items-center justify-center max-w-4xl px-5 text-center gap-8">
         <h1 className="text-4xl md:text-6xl font-bold">
           Your Fitness.{" "}
-          <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <span className="text-primary">
             Personalised.
           </span>{" "}
           Evolving
@@ -24,15 +24,15 @@ export default async function Home() {
         </p>
         <div className="flex gap-4">
           {user ? (
-            <Button asChild variant="gradient" size="lg">
+            <Button asChild variant="default" size="lg" className="rounded-xl px-8">
               <Link href="/dashboard">Go to Dashboard</Link>
             </Button>
           ) : (
             <>
-              <Button asChild variant="gradient" size="lg">
+              <Button asChild variant="default" size="lg" className="rounded-xl px-8">
                 <Link href="/sign-up">Get Started</Link>
               </Button>
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="outline" size="lg" className="rounded-xl px-8">
                 <Link href="/login">Login</Link>
               </Button>
             </>

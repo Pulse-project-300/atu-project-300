@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import { generatePlan, adaptPlan, getPlanExplanation } from "../clients/aiClient";
+import { generatePlan, adaptPlan, getPlanExplanation } from "../clients/aiClient.js";
 
 const router: Router = Router();
 

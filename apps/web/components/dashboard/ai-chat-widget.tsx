@@ -23,8 +23,8 @@ export function AIChatWidget() {
           className="w-full p-6 text-left hover:bg-accent/50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2.5">
-              <Sparkles className="h-5 w-5 text-white" />
+            <div className="rounded-full bg-primary/5 p-2.5">
+              <Sparkles className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-semibold flex items-center gap-2">
@@ -37,7 +37,7 @@ export function AIChatWidget() {
                 Get personalised workout advice and tips
               </p>
             </div>
-            <MessageSquare className="h-5 w-5 text-purple-600" />
+            <MessageSquare className="h-5 w-5 text-muted-foreground/30" />
           </div>
         </button>
       </div>
@@ -49,8 +49,8 @@ export function AIChatWidget() {
       <div className="border-b p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2">
-              <Sparkles className="h-4 w-4 text-white" />
+            <div className="rounded-full bg-primary/5 p-2">
+              <Sparkles className="h-4 w-4 text-primary" />
             </div>
             <div>
               <h3 className="text-sm font-semibold">AI Workout Assistant</h3>
@@ -72,10 +72,10 @@ export function AIChatWidget() {
         <div className="space-y-4">
           {/* Welcome message */}
           <div className="flex gap-3">
-            <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-1.5 h-fit">
-              <Sparkles className="h-3 w-3 text-white" />
+            <div className="rounded-full bg-primary/5 p-1.5 h-fit">
+              <Sparkles className="h-3 w-3 text-primary" />
             </div>
-            <div className="flex-1 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-3">
+            <div className="flex-1 rounded-lg bg-muted/50 p-3">
               <p className="text-sm">
                 Hi! I'm your AI workout assistant. I can help you with workout
                 plans, exercise tips, and answer any fitness questions you have.
@@ -96,7 +96,7 @@ export function AIChatWidget() {
                 <button
                   key={prompt}
                   onClick={() => setMessage(prompt)}
-                  className="text-left text-xs rounded-md border border-purple-500/20 bg-gradient-to-r from-purple-500/5 to-pink-500/5 px-3 py-2 hover:from-purple-500/10 hover:to-pink-500/10 transition-all"
+                  className="text-left text-xs rounded-md border border-border bg-background px-3 py-2 hover:bg-primary/5 hover:border-primary/20 transition-all"
                 >
                   {prompt}
                 </button>
@@ -119,12 +119,12 @@ export function AIChatWidget() {
               }
             }}
             placeholder="Ask me anything..."
-            className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+            className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
           <button
             onClick={handleSend}
             disabled={!message.trim()}
-            className="rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-white shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-lg bg-primary px-4 py-2 text-white shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="h-4 w-4" />
           </button>

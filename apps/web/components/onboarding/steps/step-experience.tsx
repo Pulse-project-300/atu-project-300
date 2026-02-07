@@ -2,6 +2,7 @@
 
 import { OnboardingData } from "@/lib/onboarding/types";
 import { EXPERIENCE_LEVELS } from "@/lib/onboarding/constants";
+import { cn } from "@/lib/utils";
 
 interface StepExperienceProps {
   data: OnboardingData;
@@ -25,23 +26,18 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
             <button
               key={level.value}
               onClick={() => onChange({ experienceLevel: level.value })}
-              className={`w-full text-left transition-all relative ${
+              className={cn(
+                "w-full text-left transition-all border-2 rounded-xl",
                 isSelected
-                  ? "p-4 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-                  : "inline-flex p-0.5 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500"
-              }`}
-            >
-              {isSelected ? (
-                <>
-                  <div className="font-medium">{level.label}</div>
-                  <div className="text-sm mt-1 text-white/90">{level.description}</div>
-                </>
-              ) : (
-                <div className="w-full p-4 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:text-white">
-                  <div className="font-medium text-foreground group-hover:text-white">{level.label}</div>
-                  <div className="text-sm text-muted-foreground group-hover:text-white/90 mt-1">{level.description}</div>
-                </div>
+                  ? "p-4 border-primary bg-primary text-white shadow-md shadow-primary/10"
+                  : "p-4 border-border bg-card hover:border-primary/30 text-foreground"
               )}
+            >
+              <div className="font-bold">{level.label}</div>
+              <div className={cn(
+                "text-sm mt-1",
+                isSelected ? "text-white/80" : "text-muted-foreground"
+              )}>{level.description}</div>
             </button>
           );
         })}

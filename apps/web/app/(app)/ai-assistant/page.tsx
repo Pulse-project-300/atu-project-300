@@ -69,8 +69,8 @@ export default function Page() {
           <div className="rounded-lg border bg-card shadow-sm">
             <div className="border-b p-4">
               <div className="flex items-center gap-3">
-                <div className="rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 p-2">
-                  <Dumbbell className="h-4 w-4 text-white" />
+                <div className="rounded-full bg-primary/10 p-2">
+                  <Dumbbell className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold">Your Workout Plan</h3>
@@ -85,7 +85,7 @@ export default function Page() {
               {workoutPlan.days.map((day, idx) => (
                 <div
                   key={idx}
-                  className="rounded-lg border bg-gradient-to-r from-blue-500/5 to-cyan-500/5 p-4"
+                  className="rounded-lg border bg-muted/30 p-4"
                 >
                   <h4 className="font-semibold text-sm mb-2">{day.day}</h4>
                   <div className="space-y-2">
@@ -109,7 +109,7 @@ export default function Page() {
               <button
                 onClick={handleExplainPlan}
                 disabled={isLoading}
-                className="w-full rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2.5 text-white text-sm font-medium shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full rounded-lg bg-primary px-4 py-2.5 text-white text-sm font-medium shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
@@ -131,8 +131,8 @@ export default function Page() {
             <div className="rounded-lg border bg-card shadow-sm">
               <div className="border-b p-4">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2">
-                    <Sparkles className="h-4 w-4 text-white" />
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold">AI Explanation</h3>
@@ -151,7 +151,7 @@ export default function Page() {
                     </p>
                   </div>
                 ) : (
-                  <div className="rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-4">
+                  <div className="rounded-lg bg-muted/30 p-4">
                     <p className="text-sm leading-relaxed">{explanation}</p>
                   </div>
                 )}
@@ -167,9 +167,9 @@ export default function Page() {
       </div>
 
       {/* Info Section */}
-      <div className="rounded-lg border bg-gradient-to-r from-purple-500/5 to-pink-500/5 p-6">
+      <div className="rounded-lg border bg-muted/20 p-6">
         <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-purple-600" />
+          <Sparkles className="h-4 w-4 text-primary" />
           About AI-Powered Explanations
         </h3>
         <p className="text-sm text-muted-foreground leading-relaxed">
