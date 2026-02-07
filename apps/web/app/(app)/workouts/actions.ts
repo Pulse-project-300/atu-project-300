@@ -8,6 +8,7 @@ import type {
   WorkoutWithSets,
   UpdateSetInput,
   RoutineWithExercises,
+  RoutineSetData,
 } from "@/lib/types/routines";
 
 export interface StartWorkoutResult {
@@ -98,18 +99,25 @@ export async function startWorkout(routineId: string): Promise<StartWorkoutResul
 
     // Create workout_sets from routine_exercises
     const setsToInsert: Omit<WorkoutSet, "id">[] = [];
-    
+
     for (const exercise of routineExercises) {
-      // Create the number of sets specified in target_sets
+      const setsData = exercise.sets_data as RoutineSetData[] | null;
+
+      // Get number of sets from sets_data array length
+      const numSets = setsData?.length ?? 0;
+
+      // Create the number of sets
       // Note: set_index starts at 1 due to database constraint (set_index > 0)
-      for (let setIndex = 1; setIndex <= exercise.target_sets; setIndex++) {
+      for (let setIndex = 1; setIndex <= numSets; setIndex++) {
+        const setData = setsData?.find(s => s.set_index === setIndex);
+
         setsToInsert.push({
           workout_id: workout.id,
           exercise_library_id: exercise.exercise_library_id,
           exercise_name: exercise.exercise_name,
           set_index: setIndex,
-          weight_kg: exercise.target_weight_kg,
-          reps: exercise.target_reps,
+          weight_kg: setData?.target_weight_kg ?? null,
+          reps: setData?.target_reps ?? null,
           completed: false,
           rpe: null,
           set_type: "normal",

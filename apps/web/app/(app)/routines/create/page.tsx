@@ -203,6 +203,11 @@ export default function CreateRoutinePage() {
       target_weight_kg: ex.sets[0]?.weight_kg ?? undefined,
       rest_seconds: ex.rest_seconds,
       notes: ex.notes,
+      sets_data: ex.sets.map((set, index) => ({
+        set_index: index + 1,
+        target_weight_kg: set.weight_kg,
+        target_reps: set.reps,
+      })),
     }));
 
     const result = await createRoutine(

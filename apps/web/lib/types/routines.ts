@@ -10,17 +10,22 @@ export interface Routine {
   updated_at: string;
 }
 
+// Per-set target data stored in JSONB
+export interface RoutineSetData {
+  set_index: number;
+  target_weight_kg: number | null;
+  target_reps: number | null;
+}
+
 export interface RoutineExercise {
   id: string;
   routine_id: string;
   exercise_library_id: string | null;
   exercise_name: string;
-  target_sets: number;
-  target_reps: number | null;
-  target_weight_kg: number | null;
   rest_seconds: number;
   order_index: number;
   notes: string | null;
+  sets_data: RoutineSetData[] | null;
 }
 
 export interface Workout {
@@ -90,6 +95,7 @@ export interface CreateRoutineExerciseInput {
   target_weight_kg?: number;
   rest_seconds?: number;
   notes?: string;
+  sets_data?: RoutineSetData[];
 }
 
 export interface SetInput {
