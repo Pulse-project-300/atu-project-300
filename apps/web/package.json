@@ -23,7 +23,8 @@
     "react-dom": "^19.0.0",
     "sonner": "^2.0.7",
     "supabase": "^2.48.3",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "toaster": "^0.1.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
