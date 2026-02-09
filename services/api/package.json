@@ -12,13 +12,13 @@
     "dist"
   ],
   "scripts": {
-    "dev": "DOTENV_CONFIG_PATH=./.env.local tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
-    "start": "DOTENV_CONFIG_PATH=./.env.local node dist/index.js",
-    "typecheck": "tsc --noEmit",
-    "lint": "echo \"(add ESLint config or use root shared config)\"",
-    "test": "echo \"(add tests)\""
-  },
+  "dev": "tsx watch src/index.ts",
+  "build": "tsc -p tsconfig.json",
+  "start": "node dist/index.js",
+  "typecheck": "tsc --noEmit",
+  "lint": "echo \"(add ESLint config or use root shared config)\"",
+  "test": "echo \"(add tests)\""
+},
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0",
     "axios": "^1.12.2",
