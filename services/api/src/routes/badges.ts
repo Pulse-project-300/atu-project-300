@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { supabase } from "../clients/supabaseClient";
+import { checkAndAwardBadges, updateUserStreak } from "../services/badgeService";
 import type { Badge, BadgeWithEarnedStatus, AwardBadgeRequest, AwardBadgeResponse } from "../types/badges";
 
 const router: Router = Router();
@@ -59,7 +60,43 @@ router.get("/user/:userId", async (req: Request, res: Response) => {
 });
 
 
-//give badge to user
+//check and give badge to user
+router.post("/check-and-award", async (req: Request, res: Response) => {
+    try {
+        const { user_id} = req.body;
+
+        if (!user_id) {
+        return res.status(400).json({
+            success: false,
+            message: "user_id is required",
+        });
+        }
+
+        //update users streak first
+        await updateUserStreak(user_id);
+
+        //check and award badges
+        const result = await checkAndAwardBadges(user_id);
+
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                message: result.error || "failed to check badges",
+            });
+        }
+
+        res.json({
+            success: true,
+            newlyEarnedBadges: result.newlyEarnedBadges,
+            message: result.newlyEarnedBadges.length > 0 ? `Earned ${result.newlyEarnedBadges.length} new badge(s)!` : "No new badges earned",
+        });
+    } catch (error: any) {
+        console.error("Error in check-and-award:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+//manually award a badge to a user (for testing/admin purposes)
 router.post("/award", async (req: Request, res: Response) => {
     try {
         const { user_id, badge_code }: AwardBadgeRequest = req.body;
@@ -99,9 +136,9 @@ router.post("/award", async (req: Request, res: Response) => {
             message: "Badge already earned",
             badge: existing,
         } as AwardBadgeResponse);
-    }
+        }
 
-    const { data: newBadge, error: awardError } = await supabase
+        const { data: newBadge, error: awardError } = await supabase
         .from("user_badges")
         .insert({
             user_id,
@@ -110,9 +147,9 @@ router.post("/award", async (req: Request, res: Response) => {
         .select()
         .single();
 
-    if (awardError) throw awardError;
+        if (awardError) throw awardError;
 
-    res.json({
+        res.json({
         success: true,
         message: `Badge "${badge.name}" awarded!`,
         badge: newBadge,
@@ -122,6 +159,8 @@ router.post("/award", async (req: Request, res: Response) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
+
 
 //get badge details
 router.get("/:badgeId", async (req: Request, res: Response) => {
