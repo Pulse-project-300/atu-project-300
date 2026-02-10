@@ -20,6 +20,7 @@ export interface StartWorkoutResult {
 export interface ActionResult {
   success: boolean;
   error?: string;
+  newBadges?: any[];
 }
 
 export interface UpdateSetResult {
@@ -361,11 +362,40 @@ export async function completeWorkout(workoutId: string): Promise<ActionResult> 
 
     if (error) throw error;
 
+    //check for any new badges
+    let newBadges: any[] = [];
+    try{
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const badgeResponse = await fetch(`${apiUrl}/badges/check-and-award`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+        })
+      });
+
+      if (badgeResponse.ok) {
+        const badgeData = await badgeResponse.json();
+        newBadges = badgeData.newlyEarnedBadges || [];
+      }
+    } catch (badgeError){
+      console.error("Failed to check/award badges:", badgeError);
+
+      //dont fail workot completion if badge check fails
+    }
+
     revalidatePath("/routines");
     revalidatePath("/dashboard");
     revalidatePath("/progress");
+    revalidatePath("/achievements");
 
-    return { success: true };
+    return { 
+      success: true, 
+      newBadges: newBadges,
+    };
+
   } catch (err) {
     console.error("Failed to complete workout:", err);
     return { success: false, error: "Failed to complete workout" };

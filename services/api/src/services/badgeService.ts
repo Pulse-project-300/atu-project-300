@@ -2,7 +2,6 @@ import { supabase } from "../clients/supabaseClient";
 import type { Badge, UserBadge, BadgeCriteria } from "../types/badges";
 
 //badge service, handles all badge evaluation and awarding logic
-
 interface BadgeCheckResult {
     badge: Badge;
     earned: boolean;
@@ -28,7 +27,7 @@ export async function checkAndAwardBadges(userId: string): Promise<{
         //get all badges
         const { data: allBadges, error: badgesError } = await supabase
             .from("badges")
-            .select('*');
+            .select("*");
 
         if(badgesError) throw badgesError;
         if(!allBadges || allBadges.length === 0) {
@@ -38,8 +37,8 @@ export async function checkAndAwardBadges(userId: string): Promise<{
         //get users current badges
         const {data: earnedBadges, error: earnedError } = await supabase
             .from("user_badges")
-            .select('badge_id')
-            .eq('user_id', userId);
+            .select("badge_id")
+            .eq("user_id", userId);
 
         if(earnedError) throw earnedError;
 
