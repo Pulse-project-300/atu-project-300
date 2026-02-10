@@ -1,6 +1,7 @@
 "use client";
 
 import { AIChatWidget } from "@/components/dashboard/ai-chat-widget";
+import { AIAssistantFAB } from "@/components/ai-assistant/ai-assistant-fab";
 import { useState } from "react";
 import { Dumbbell, Sparkles, Loader2 } from "lucide-react";
 
@@ -180,6 +181,14 @@ export default function Page() {
           training objectives to deliver tailored guidance.
         </p>
       </div>
+
+      {/* AI Assistant Drawer */}
+      <AIAssistantFAB
+        context={{
+          plan: workoutPlan,
+          profile: { goal: "strength", experience: "beginner" },
+        }}
+      />
     </div>
   );
 }

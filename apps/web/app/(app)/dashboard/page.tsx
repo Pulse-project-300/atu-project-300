@@ -1,10 +1,10 @@
 import { DashboardAnalytics } from "@/components/dashboard/dashboard-analytics";
 import { WeeklyChart } from "@/components/dashboard/weekly-chart";
 import { RoutinesList } from "@/components/dashboard/routines-list";
-import { AIChatWidget } from "@/components/dashboard/ai-chat-widget";
 import { createClient } from "@/lib/supabase/server";
 
 import { BadgesWidget } from "@/components/dashboard/badges-widget";
+import { AIAssistantFAB } from "@/components/ai-assistant/ai-assistant-fab";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -52,8 +52,10 @@ export default async function DashboardPage() {
         <BadgesWidget />
       </div>
 
-      {/* AI Chat Widget */}
-      <AIChatWidget />
+      {/* AI Chat Drawer */}
+     
+
+      <AIAssistantFAB />
     </div>
   );
 }
