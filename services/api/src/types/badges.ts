@@ -55,3 +55,19 @@ export interface AwardBadgeResponse {
     badge?: UserBadge;
     message?: string;
     }
+
+//interfaces for badge service
+export interface BadgeCheckResult {
+    badge: Badge;
+    earned: boolean;
+    alreadyHad: boolean;
+}
+
+export interface WorkoutStats {
+    totalWorkouts: number;
+    currentStreak: number;
+    longestStreak: number;
+    morningWorkouts: number;
+    strengthWorkouts: number;
+    cardioWorkouts: number;
+}

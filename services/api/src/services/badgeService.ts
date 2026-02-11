@@ -1,7 +1,9 @@
 import { supabase } from "../clients/supabaseClient";
 import type { Badge, UserBadge, BadgeCriteria } from "../types/badges";
+import type { BadgeCheckResult, WorkoutStats } from "../types/badges";
 
 //badge service, handles all badge evaluation and awarding logic
+/*
 interface BadgeCheckResult {
     badge: Badge;
     earned: boolean;
@@ -16,6 +18,7 @@ interface WorkoutStats {
     strengthWorkouts: number;
     cardioWorkouts: number;
 }
+*/
 
 //check and award all applicable badges for a user
 export async function checkAndAwardBadges(userId: string): Promise<{
