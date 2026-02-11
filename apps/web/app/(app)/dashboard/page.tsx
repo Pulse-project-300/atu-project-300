@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DashboardAnalytics } from "@/components/dashboard/dashboard-analytics";
 import { WeeklyChart } from "@/components/dashboard/weekly-chart";
 import { RoutinesList } from "@/components/dashboard/routines-list";
 import { AIChatWidget } from "@/components/dashboard/ai-chat-widget";
@@ -28,9 +27,6 @@ export default function DashboardPage() {
           Here's your fitness overview and quick actions
         </p>
       </div>
-
-      {/* Analytics Metrics */}
-      <DashboardAnalytics />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

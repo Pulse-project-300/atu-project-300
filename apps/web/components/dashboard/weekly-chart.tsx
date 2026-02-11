@@ -32,9 +32,9 @@ export function WeeklyChart() {
           </p>
         </div>
         <div className="flex items-end justify-between gap-4 px-2 animate-pulse" style={{ height: '400px' }}>
-          {Array.from({ length: 8 }).map((_, i) => (
+          {[120, 180, 90, 200, 60, 150, 110, 170].map((h, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-3 h-full justify-end">
-              <div className="w-full bg-muted-foreground/10 rounded-t-xl" style={{ height: `${40 + Math.random() * 200}px` }} />
+              <div className="w-full bg-muted-foreground/10 rounded-t-xl" style={{ height: `${h}px` }} />
               <div className="h-3 w-10 bg-muted-foreground/10 rounded" />
             </div>
           ))}
@@ -65,7 +65,7 @@ export function WeeklyChart() {
         </div>
       ) : (
         <>
-          <div className="flex items-end justify-between gap-4 px-2" style={{ height: '400px' }}>
+          <div className="flex items-end justify-between gap-4 px-2" style={{ height: '400px' }} role="img" aria-label={`Weekly activity chart. ${weekData.filter(w => w.workouts > 0).length} of ${weekData.length} weeks had workouts.`}>
             {weekData.map((week, index) => {
               // Calculate height in pixels for much more dramatic differences
               const heightInPx = (week.hours / maxScale) * 380; // 380px out of 400px max
@@ -77,12 +77,12 @@ export function WeeklyChart() {
                   <div className="relative w-full flex flex-col justify-end" style={{ height: '380px' }}>
                     {/* Tooltip */}
                     <div className="absolute -top-16 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                      <div className="bg-gray-900 dark:bg-gray-800 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap shadow-xl">
+                      <div className="bg-popover text-popover-foreground text-sm px-3 py-2 rounded-lg whitespace-nowrap shadow-xl border">
                         <div className="font-bold text-base">{week.hours}h</div>
-                        <div className="text-gray-300 text-xs">{week.workouts} workouts</div>
+                        <div className="text-muted-foreground text-xs">{week.workouts} workouts</div>
                       </div>
                       {/* Arrow */}
-                      <div className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-gray-900 dark:bg-gray-800 rotate-45"></div>
+                      <div className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-popover border-b border-r rotate-45"></div>
                     </div>
 
                     {/* Bar */}

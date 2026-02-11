@@ -3,6 +3,7 @@
 import { AIChatWidget } from "@/components/dashboard/ai-chat-widget";
 import { useState } from "react";
 import { Dumbbell, Sparkles, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Sample workout plan for demonstration
 const SAMPLE_PLAN = {
@@ -106,10 +107,10 @@ export default function Page() {
             </div>
 
             <div className="border-t p-4">
-              <button
+              <Button
                 onClick={handleExplainPlan}
                 disabled={isLoading}
-                className="w-full rounded-lg bg-primary px-4 py-2.5 text-white text-sm font-medium shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full"
               >
                 {isLoading ? (
                   <>
@@ -122,7 +123,7 @@ export default function Page() {
                     Explain This Plan with AI
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
 
