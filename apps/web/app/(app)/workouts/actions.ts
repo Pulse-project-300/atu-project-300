@@ -363,7 +363,7 @@ export async function completeWorkout(workoutId: string): Promise<ActionResult> 
 
     revalidatePath("/routines");
     revalidatePath("/dashboard");
-    revalidatePath("/progress");
+    revalidatePath("/analytics");
 
     return { success: true };
   } catch (err) {

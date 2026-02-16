@@ -2,6 +2,7 @@
 
 import { MessageSquare, Send, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function AIChatWidget() {
   const [message, setMessage] = useState("");
@@ -59,12 +60,14 @@ export function AIChatWidget() {
               </p>
             </div>
           </div>
-          <button
+          <Button
             onClick={() => setIsExpanded(false)}
-            className="text-xs text-muted-foreground hover:text-foreground"
+            variant="ghost"
+            size="sm"
+            aria-label="Minimize chat"
           >
             Minimize
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -121,13 +124,14 @@ export function AIChatWidget() {
             placeholder="Ask me anything..."
             className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
-          <button
+          <Button
             onClick={handleSend}
             disabled={!message.trim()}
-            className="rounded-lg bg-primary px-4 py-2 text-white shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            size="icon"
+            aria-label="Send message"
           >
             <Send className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

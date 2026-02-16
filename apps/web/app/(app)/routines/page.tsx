@@ -3,6 +3,7 @@ import { Dumbbell, Plus } from "lucide-react";
 import Link from "next/link";
 import type { Routine } from "@/lib/types/routines";
 import { RoutineCard } from "@/components/routines/routine-card";
+import { Button } from "@/components/ui/button";
 
 export default async function RoutinesPage() {
   const supabase = await createClient();
@@ -22,13 +23,12 @@ export default async function RoutinesPage() {
             Your workout routines
           </p>
         </div>
-        <Link
-          href="/routines/create"
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
-        >
-          <Plus className="h-4 w-4" />
-          New Routine
-        </Link>
+        <Button asChild>
+          <Link href="/routines/create">
+            <Plus className="h-4 w-4" />
+            New Routine
+          </Link>
+        </Button>
       </div>
 
       {error ? (
@@ -44,13 +44,12 @@ export default async function RoutinesPage() {
           <p className="text-muted-foreground mb-4">
             Create your first workout routine to get started
           </p>
-          <Link
-            href="/routines/create"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary/90 transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            Create Routine
-          </Link>
+          <Button asChild>
+            <Link href="/routines/create">
+              <Plus className="h-4 w-4" />
+              Create Routine
+            </Link>
+          </Button>
         </div>
       ) : (
         <div className="grid gap-4">

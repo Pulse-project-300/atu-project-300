@@ -1,26 +1,20 @@
-import { DashboardAnalytics } from "@/components/dashboard/dashboard-analytics";
+"use client";
+
+import { useEffect, useState } from "react";
 import { WeeklyChart } from "@/components/dashboard/weekly-chart";
 import { RoutinesList } from "@/components/dashboard/routines-list";
 import { AIChatWidget } from "@/components/dashboard/ai-chat-widget";
-import { createClient } from "@/lib/supabase/server";
-
 import { BadgesWidget } from "@/components/dashboard/badges-widget";
+import { getDashboardProfile } from "./actions";
 
-export default async function DashboardPage() {
-  const supabase = await createClient();
+export default function DashboardPage() {
+  const [displayName, setDisplayName] = useState("User");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Fetch user profile from database
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user!.id)
-    .single();
-
-  const displayName = profileData?.name || "User";
+  useEffect(() => {
+    getDashboardProfile().then(({ displayName }) =>
+      setDisplayName(displayName),
+    );
+  }, []);
 
   return (
     <div className="w-full space-y-8 pb-8">
@@ -33,9 +27,6 @@ export default async function DashboardPage() {
           Here's your fitness overview and quick actions
         </p>
       </div>
-
-      {/* Analytics Metrics */}
-      <DashboardAnalytics />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
