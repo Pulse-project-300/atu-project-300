@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Sparkles,
   Send,
@@ -8,14 +9,45 @@ import {
   Wand2,
   RefreshCw,
   BookOpen,
+  Save,
 } from "lucide-react";
 
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: number;
+}
+
+interface PlanDay {
+  day: string;
+  workout: Exercise[];
+}
+
+interface WorkoutPlan {
+  version?: number;
+  days: PlanDay[];
+}
+
 export interface AIAssistantContext {
-  plan?: any;
+  plan?: WorkoutPlan;
   profile?: {
     goal?: string;
     experience?: string;
   };
+}
+
+interface RoutineExerciseSummary {
+  exercise_name: string;
+  order_index: number;
+  sets_data: { set_index: number; target_reps: number | null; target_weight_kg: number | null }[] | null;
+  rest_seconds: number;
+}
+
+interface RoutineSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  routine_exercises: RoutineExerciseSummary[];
 }
 
 interface Message {
@@ -29,16 +61,22 @@ interface AIAssistantDrawerProps {
 }
 
 export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
       content:
-        "Hi! I'm your AI workout assistant. I can generate new plans, adapt your existing plan, or explain what your current plan does. Use the quick actions below or type a message.",
+        "Hi! I'm your Pulse AI workout assistant. I can generate new plans, adapt your existing plan, or explain what your current plan does. Use the quick actions below or type a message.",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [lastGeneratedPlan, setLastGeneratedPlan] = useState<WorkoutPlan | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [routinePickerItems, setRoutinePickerItems] = useState<RoutineSummary[]>([]);
+  const [pickerMode, setPickerMode] = useState<"adapt" | "explain" | null>(null);
+  const [pendingAdaptFeedback, setPendingAdaptFeedback] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -75,47 +113,63 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
       const data = await res.json();
       const planText = formatPlanResponse(data);
       addMessage("assistant", planText);
-    } catch (err: any) {
-      addMessage("assistant", `Sorry, I couldn't generate a plan. ${err.message}`);
+      if (data.plan) setLastGeneratedPlan(data.plan);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      addMessage("assistant", `Sorry, I couldn't generate a plan. ${message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleAdaptPlan = async () => {
-    if (isLoading) return;
-    if (!context?.plan) {
-      addMessage("user", "Adapt my current plan");
-      addMessage(
-        "assistant",
-        "I don't have a plan loaded in the current context. Navigate to a page with a plan, or generate one first."
-      );
-      return;
-    }
-
-    addMessage("user", "Adapt my current workout plan");
-    setIsLoading(true);
+  const handleSaveAsRoutine = async () => {
+    if (!lastGeneratedPlan || isSaving) return;
+    setIsSaving(true);
 
     try {
-      const res = await fetch("/api/plans/adapt", {
+      const res = await fetch("/api/plans/save-routine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: "current",
-          profile: context?.profile || { goal: "strength", experience: "beginner" },
-          currentPlan: context.plan,
-          recentLogs: [],
-          feedback: "Progress the plan to the next level",
-          currentVersion: context.plan.version || 1,
-        }),
+        body: JSON.stringify({ plan: lastGeneratedPlan }),
       });
 
       if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
+      await res.json();
+      addMessage("assistant", "Routine saved successfully! Redirecting to your routines...");
+      setLastGeneratedPlan(null);
+      router.push("/routines");
+      router.refresh();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      addMessage("assistant", `Sorry, I couldn't save the routine. ${message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAdaptPlan = async () => {
+    if (isLoading) return;
+    addMessage("user", "Adapt an existing routine");
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/routines");
+      if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
       const data = await res.json();
-      const planText = formatPlanResponse(data);
-      addMessage("assistant", planText);
-    } catch (err: any) {
-      addMessage("assistant", `Sorry, I couldn't adapt the plan. ${err.message}`);
+      const routines: RoutineSummary[] = data.routines || [];
+
+      if (routines.length === 0) {
+        addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
+        setRoutinePickerItems([]);
+      } else {
+        addMessage("assistant", "Which routine would you like me to adapt? Pick one below:");
+        setRoutinePickerItems(routines);
+        setPickerMode("adapt");
+        setPendingAdaptFeedback("Progress the plan to the next level");
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      addMessage("assistant", `Sorry, I couldn't load your routines. ${message}`);
     } finally {
       setIsLoading(false);
     }
@@ -123,35 +177,91 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
 
   const handleExplainPlan = async () => {
     if (isLoading) return;
-    if (!context?.plan) {
-      addMessage("user", "Explain my current plan");
-      addMessage(
-        "assistant",
-        "I don't have a plan loaded in the current context. Navigate to a page with a plan, or generate one first."
-      );
-      return;
-    }
-
-    addMessage("user", "Explain my current workout plan");
+    addMessage("user", "Explain a routine");
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/plans/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          plan: context.plan,
-          profile: context?.profile,
-        }),
-      });
-
+      const res = await fetch("/api/routines");
       if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
       const data = await res.json();
-      addMessage("assistant", data.explanation || JSON.stringify(data));
-    } catch (err: any) {
-      addMessage("assistant", `Sorry, I couldn't explain the plan. ${err.message}`);
+      const routines: RoutineSummary[] = data.routines || [];
+
+      if (routines.length === 0) {
+        addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
+        setRoutinePickerItems([]);
+      } else {
+        addMessage("assistant", "Which routine would you like me to explain? Pick one below:");
+        setRoutinePickerItems(routines);
+        setPickerMode("explain");
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      addMessage("assistant", `Sorry, I couldn't load your routines. ${message}`);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSelectRoutine = async (routine: RoutineSummary) => {
+    const mode = pickerMode;
+    setRoutinePickerItems([]);
+    setPickerMode(null);
+
+    const currentPlan: WorkoutPlan = routineToWorkoutPlan(routine);
+
+    if (mode === "adapt") {
+      addMessage("user", `Adapt "${routine.name}"`);
+      setIsLoading(true);
+      setPendingAdaptFeedback(null);
+
+      try {
+        const res = await fetch("/api/plans/adapt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: "current",
+            profile: context?.profile || { goal: "strength", experience: "beginner" },
+            currentPlan,
+            recentLogs: [],
+            feedback: pendingAdaptFeedback || "Progress the plan to the next level",
+            currentVersion: currentPlan.version || 1,
+          }),
+        });
+
+        if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
+        const data = await res.json();
+        const planText = formatPlanResponse(data);
+        addMessage("assistant", planText);
+        if (data.plan) setLastGeneratedPlan(data.plan);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        addMessage("assistant", `Sorry, I couldn't adapt the plan. ${message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (mode === "explain") {
+      addMessage("user", `Explain "${routine.name}"`);
+      setIsLoading(true);
+
+      try {
+        const res = await fetch("/api/plans/explain", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plan: currentPlan,
+            profile: context?.profile,
+          }),
+        });
+
+        if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
+        const data = await res.json();
+        addMessage("assistant", data.explanation || JSON.stringify(data));
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        addMessage("assistant", `Sorry, I couldn't explain the plan. ${message}`);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -180,65 +290,43 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
         const data = await res.json();
         addMessage("assistant", formatPlanResponse(data));
       } else if (lower.includes("adapt") || lower.includes("change") || lower.includes("modify")) {
-        if (!context?.plan) {
-          addMessage("assistant", "I don't have a plan loaded to adapt. Try generating one first.");
+        // Fetch routines and show picker
+        const routinesRes = await fetch("/api/routines");
+        if (!routinesRes.ok) throw new Error(`Failed: ${routinesRes.statusText}`);
+        const routinesData = await routinesRes.json();
+        const routines: RoutineSummary[] = routinesData.routines || [];
+
+        if (routines.length === 0) {
+          addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
         } else {
-          const res = await fetch("/api/plans/adapt", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: "current",
-              profile: context?.profile || { goal: "strength", experience: "beginner" },
-              currentPlan: context.plan,
-              recentLogs: [],
-              feedback: trimmed,
-              currentVersion: context.plan.version || 1,
-            }),
-          });
-          if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
-          const data = await res.json();
-          addMessage("assistant", formatPlanResponse(data));
+          addMessage("assistant", "Which routine would you like me to adapt? Pick one below:");
+          setRoutinePickerItems(routines);
+          setPickerMode("adapt");
+          setPendingAdaptFeedback(trimmed);
         }
       } else if (lower.includes("explain") || lower.includes("why") || lower.includes("what does")) {
-        if (!context?.plan) {
-          addMessage("assistant", "I don't have a plan loaded to explain. Try generating one first.");
+        // Fetch routines and show picker for explain
+        const routinesRes = await fetch("/api/routines");
+        if (!routinesRes.ok) throw new Error(`Failed: ${routinesRes.statusText}`);
+        const routinesData = await routinesRes.json();
+        const routines: RoutineSummary[] = routinesData.routines || [];
+
+        if (routines.length === 0) {
+          addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
         } else {
-          const res = await fetch("/api/plans/explain", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              plan: context.plan,
-              profile: context?.profile,
-            }),
-          });
-          if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
-          const data = await res.json();
-          addMessage("assistant", data.explanation || JSON.stringify(data));
+          addMessage("assistant", "Which routine would you like me to explain? Pick one below:");
+          setRoutinePickerItems(routines);
+          setPickerMode("explain");
         }
       } else {
-        // Fallback: try explain endpoint as a general question about the plan
-        if (context?.plan) {
-          const res = await fetch("/api/plans/explain", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              plan: context.plan,
-              profile: context?.profile,
-              question: trimmed,
-            }),
-          });
-          if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
-          const data = await res.json();
-          addMessage("assistant", data.explanation || JSON.stringify(data));
-        } else {
-          addMessage(
-            "assistant",
-            "I can help you generate a new plan, adapt an existing one, or explain a plan. Try the quick actions above, or ask me something specific!"
-          );
-        }
+        addMessage(
+          "assistant",
+          "I can help you generate a new plan, adapt an existing one, or explain a plan. Try the quick actions above, or ask me something specific!"
+        );
       }
-    } catch (err: any) {
-      addMessage("assistant", `Something went wrong. ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      addMessage("assistant", `Something went wrong. ${message}`);
     } finally {
       setIsLoading(false);
     }
@@ -317,6 +405,40 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
           </div>
         ))}
 
+        {routinePickerItems.length > 0 && !isLoading && (
+          <div className="space-y-2 px-2">
+            {routinePickerItems.map((routine) => (
+              <button
+                key={routine.id}
+                onClick={() => handleSelectRoutine(routine)}
+                className="w-full text-left rounded-lg border bg-background p-3 hover:bg-accent transition-colors"
+              >
+                <p className="text-sm font-medium">{routine.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {routine.routine_exercises.length} exercise{routine.routine_exercises.length !== 1 ? "s" : ""}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {lastGeneratedPlan && !isLoading && (
+          <div className="flex justify-center">
+            <button
+              onClick={handleSaveAsRoutine}
+              disabled={isSaving}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {isSaving ? "Saving..." : "Save as Routine"}
+            </button>
+          </div>
+        )}
+
         {isLoading && (
           <div className="flex gap-3">
             <div className="rounded-full bg-primary/10 p-1.5 h-fit shrink-0">
@@ -361,12 +483,45 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
   );
 }
 
-function formatPlanResponse(data: any): string {
+function routineToWorkoutPlan(routine: RoutineSummary): WorkoutPlan {
+  // Group exercises by day prefix (e.g. "Mon - Squat" → day "Mon")
+  // If no day prefix, group all under "Workout"
+  const dayMap = new Map<string, Exercise[]>();
+
+  for (const ex of routine.routine_exercises) {
+    const dashIndex = ex.exercise_name.indexOf(" - ");
+    let dayLabel: string;
+    let exerciseName: string;
+
+    if (dashIndex > -1) {
+      dayLabel = ex.exercise_name.substring(0, dashIndex);
+      exerciseName = ex.exercise_name.substring(dashIndex + 3);
+    } else {
+      dayLabel = "Workout";
+      exerciseName = ex.exercise_name;
+    }
+
+    const sets = ex.sets_data?.length || 1;
+    const reps = ex.sets_data?.[0]?.target_reps || 10;
+
+    if (!dayMap.has(dayLabel)) dayMap.set(dayLabel, []);
+    dayMap.get(dayLabel)!.push({ name: exerciseName, sets, reps });
+  }
+
+  const days: PlanDay[] = Array.from(dayMap.entries()).map(([day, workout]) => ({
+    day,
+    workout,
+  }));
+
+  return { version: 1, days };
+}
+
+function formatPlanResponse(data: { plan?: WorkoutPlan; explanation?: string }): string {
   if (data.explanation) return data.explanation;
 
   // Format a plan object into readable text
-  const plan = data.plan || data;
-  if (plan.days && Array.isArray(plan.days)) {
+  const plan = data.plan;
+  if (plan?.days && Array.isArray(plan.days)) {
     let text = `Here's your workout plan (v${plan.version || 1}):\n\n`;
     for (const day of plan.days) {
       text += `${day.day}:\n`;
