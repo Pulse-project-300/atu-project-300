@@ -48,6 +48,24 @@ export function OnboardingContainer() {
     }
   };
 
+  const handleSkip = async () => {
+    setIsGenerating(true);
+    setStatus("Saving profile...");
+    try {
+      const saveResult = await saveOnboardingProfile(data);
+      if (saveResult.error) {
+        setStatus(`Error saving profile: ${saveResult.error}`);
+        return;
+      }
+      router.push("/routines");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      setStatus("Error: " + (error as Error).message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleNext = async () => {
     if (currentStep === TOTAL_STEPS) {
       // Final step - save profile and generate routine
@@ -153,6 +171,14 @@ export function OnboardingContainer() {
                 Click finish to generate your personalised workout routine
               </p>
             </div>
+            <button
+              type="button"
+              onClick={handleSkip}
+              disabled={isGenerating}
+              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors disabled:opacity-50"
+            >
+              Skip for now — I&apos;ll create my own routines
+            </button>
           </div>
         );
       default:
@@ -178,7 +204,7 @@ export function OnboardingContainer() {
 
         {status && (
           <div className="mt-8 p-4 bg-muted rounded-lg border">
-            <h3 className="text-sm font-semibold mb-2">API Response:</h3>
+            <h3 className="text-sm font-semibold mb-2">Generating...</h3>
             <pre className="text-xs overflow-auto max-h-64 whitespace-pre-wrap">
               {status}
             </pre>
