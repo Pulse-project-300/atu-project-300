@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers.plan import router as plan_router
+from app.routers.routine import router as routine_router
 
 app = FastAPI(title="Pulse AI Orchestrator")
 
@@ -8,4 +8,4 @@ app = FastAPI(title="Pulse AI Orchestrator")
 def health():
     return {"status": "ok", "service": "ai-orchestrator"}
 
-app.include_router(plan_router, prefix="/plan") # Include the plan router
+app.include_router(routine_router, prefix="/routine")
