@@ -14,7 +14,7 @@ export async function generatePlan(input: {
   history?: Record<string, any>[];
 }) {
   const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/generate`, input, {
-    timeout: 15000,
+    timeout: 30000,
   });
   return data;
 }
@@ -31,7 +31,7 @@ export async function adaptPlan(input: {
   currentVersion?: number;
 }) {
   const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/adapt`, input, {
-    timeout: 15000,
+    timeout: 30000,
   });
   return data;
 }
@@ -46,7 +46,7 @@ export async function getPlanExplanation(input: {
   profile?: Record<string, any>;
 }) {
   const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/explain`, input, {
-    timeout: 15000,
+    timeout: 30000,
   });
   return data;
 }

@@ -28,37 +28,58 @@ const ExplainSchema = z.object({
 
 // POST /plans/generate
 router.post("/generate", async (req: Request, res: Response) => {
+  let input;
   try {
-    const input = GenerateSchema.parse(req.body);
+    input = GenerateSchema.parse(req.body);
+  } catch (err: unknown) {
+    res.status(400).json({ error: err instanceof Error ? err.message : "Invalid request body" });
+    return;
+  }
+  try {
     const data = await generatePlan(input);
     res.json(data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in /plans/generate:", err);
-    res.status(400).json({ error: err.message });
+    const message = err instanceof Error ? err.message : "AI service error";
+    res.status(502).json({ error: `AI service failed: ${message}` });
   }
 });
 
 // POST /plans/adapt
 router.post("/adapt", async (req: Request, res: Response) => {
+  let input;
   try {
-    const input = AdaptSchema.parse(req.body);
+    input = AdaptSchema.parse(req.body);
+  } catch (err: unknown) {
+    res.status(400).json({ error: err instanceof Error ? err.message : "Invalid request body" });
+    return;
+  }
+  try {
     const data = await adaptPlan(input);
     res.json(data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in /plans/adapt:", err);
-    res.status(400).json({ error: err.message });
+    const message = err instanceof Error ? err.message : "AI service error";
+    res.status(502).json({ error: `AI service failed: ${message}` });
   }
 });
 
 // POST /plans/explain
 router.post("/explain", async (req: Request, res: Response) => {
+  let input;
   try {
-    const input = ExplainSchema.parse(req.body);
+    input = ExplainSchema.parse(req.body);
+  } catch (err: unknown) {
+    res.status(400).json({ error: err instanceof Error ? err.message : "Invalid request body" });
+    return;
+  }
+  try {
     const data = await getPlanExplanation(input);
     res.json(data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in /plans/explain:", err);
-    res.status(400).json({ error: err.message });
+    const message = err instanceof Error ? err.message : "AI service error";
+    res.status(502).json({ error: `AI service failed: ${message}` });
   }
 });
 
