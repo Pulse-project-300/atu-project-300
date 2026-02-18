@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import {
   Sparkles,
   Send,
@@ -11,28 +12,28 @@ import {
   BookOpen,
   Save,
 } from "lucide-react";
+import { RoutineExerciseCard } from "./routine-exercise-card";
 
-interface Exercise {
+interface GeneratedRoutineExercise {
+  exercise_name: string;
+  exercise_library_id?: string;
+  sets_data: { set_index: number; target_reps: number | null; target_weight_kg: number | null }[];
+  rest_seconds: number;
+  order_index: number;
+  notes?: string;
+}
+
+interface GeneratedRoutine {
   name: string;
-  sets: number;
-  reps: number;
-}
-
-interface PlanDay {
-  day: string;
-  workout: Exercise[];
-}
-
-interface WorkoutPlan {
-  version?: number;
-  days: PlanDay[];
+  description?: string;
+  exercises: GeneratedRoutineExercise[];
 }
 
 export interface AIAssistantContext {
-  plan?: WorkoutPlan;
   profile?: {
     goal?: string;
     experience?: string;
+    equipment?: string[];
   };
 }
 
@@ -67,17 +68,44 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
       id: "welcome",
       role: "assistant",
       content:
-        "Hi! I'm your Pulse AI workout assistant. I can generate new plans, adapt your existing plan, or explain what your current plan does. Use the quick actions below or type a message.",
+        "Hi! I'm your Pulse AI workout assistant. I can generate new routines, adapt your existing routines, or explain what a routine does. Use the quick actions below or type a message.",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [lastGeneratedPlan, setLastGeneratedPlan] = useState<WorkoutPlan | null>(null);
+  const [lastGeneratedRoutine, setLastGeneratedRoutine] = useState<GeneratedRoutine | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [routinePickerItems, setRoutinePickerItems] = useState<RoutineSummary[]>([]);
   const [pickerMode, setPickerMode] = useState<"adapt" | "explain" | null>(null);
   const [pendingAdaptFeedback, setPendingAdaptFeedback] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user profile from Supabase on mount
+  const [userProfile, setUserProfile] = useState<AIAssistantContext["profile"] | null>(null);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("fitness_goal, experience_level, equipment")
+        .eq("user_id", user.id)
+        .single();
+      if (data) {
+        setUserProfile({
+          goal: data.fitness_goal,
+          experience: data.experience_level,
+          equipment: data.equipment,
+        });
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const profileForApi = useCallback(() => {
+    return context?.profile || userProfile || { goal: "strength", experience: "beginner" };
+  }, [context?.profile, userProfile]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,9 +121,19 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
     return msg;
   };
 
-  const handleGeneratePlan = async () => {
+  const handleUpdateExercise = (orderIndex: number, updated: GeneratedRoutineExercise) => {
+    if (!lastGeneratedRoutine) return;
+    setLastGeneratedRoutine({
+      ...lastGeneratedRoutine,
+      exercises: lastGeneratedRoutine.exercises.map((ex) =>
+        ex.order_index === orderIndex ? updated : ex
+      ),
+    });
+  };
+
+  const handleGenerateRoutine = async () => {
     if (isLoading) return;
-    addMessage("user", "Generate a new workout plan for me");
+    addMessage("user", "Generate a new workout routine for me");
     setIsLoading(true);
 
     try {
@@ -104,39 +142,39 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: "current",
-          profile: context?.profile || { goal: "strength", experience: "beginner" },
+          profile: profileForApi(),
           history: [],
         }),
       });
 
       if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
       const data = await res.json();
-      const planText = formatPlanResponse(data);
-      addMessage("assistant", planText);
-      if (data.plan) setLastGeneratedPlan(data.plan);
+      const text = formatRoutineResponse(data);
+      addMessage("assistant", text);
+      if (data.routine) setLastGeneratedRoutine(data.routine);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unknown error";
-      addMessage("assistant", `Sorry, I couldn't generate a plan. ${message}`);
+      addMessage("assistant", `Sorry, I couldn't generate a routine. ${message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSaveAsRoutine = async () => {
-    if (!lastGeneratedPlan || isSaving) return;
+    if (!lastGeneratedRoutine || isSaving) return;
     setIsSaving(true);
 
     try {
       const res = await fetch("/api/plans/save-routine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: lastGeneratedPlan }),
+        body: JSON.stringify({ routine: lastGeneratedRoutine }),
       });
 
       if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
       await res.json();
       addMessage("assistant", "Routine saved successfully! Redirecting to your routines...");
-      setLastGeneratedPlan(null);
+      setLastGeneratedRoutine(null);
       router.push("/routines");
       router.refresh();
     } catch (err: unknown) {
@@ -147,7 +185,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
     }
   };
 
-  const handleAdaptPlan = async () => {
+  const handleAdaptRoutine = async () => {
     if (isLoading) return;
     addMessage("user", "Adapt an existing routine");
     setIsLoading(true);
@@ -159,13 +197,13 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
       const routines: RoutineSummary[] = data.routines || [];
 
       if (routines.length === 0) {
-        addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
+        addMessage("assistant", "You don't have any routines yet. Try generating one first!");
         setRoutinePickerItems([]);
       } else {
         addMessage("assistant", "Which routine would you like me to adapt? Pick one below:");
         setRoutinePickerItems(routines);
         setPickerMode("adapt");
-        setPendingAdaptFeedback("Progress the plan to the next level");
+        setPendingAdaptFeedback("Progress the routine to the next level");
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unknown error";
@@ -175,7 +213,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
     }
   };
 
-  const handleExplainPlan = async () => {
+  const handleExplainRoutine = async () => {
     if (isLoading) return;
     addMessage("user", "Explain a routine");
     setIsLoading(true);
@@ -187,7 +225,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
       const routines: RoutineSummary[] = data.routines || [];
 
       if (routines.length === 0) {
-        addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
+        addMessage("assistant", "You don't have any routines yet. Try generating one first!");
         setRoutinePickerItems([]);
       } else {
         addMessage("assistant", "Which routine would you like me to explain? Pick one below:");
@@ -207,7 +245,8 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
     setRoutinePickerItems([]);
     setPickerMode(null);
 
-    const currentPlan: WorkoutPlan = routineToWorkoutPlan(routine);
+    // Convert DB routine to the flat format the API expects
+    const routineData = routineSummaryToRoutineData(routine);
 
     if (mode === "adapt") {
       addMessage("user", `Adapt "${routine.name}"`);
@@ -220,22 +259,21 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId: "current",
-            profile: context?.profile || { goal: "strength", experience: "beginner" },
-            currentPlan,
-            recentLogs: [],
-            feedback: pendingAdaptFeedback || "Progress the plan to the next level",
-            currentVersion: currentPlan.version || 1,
+            profile: profileForApi(),
+            currentRoutine: routineData,
+            routineId: routine.id,
+            feedback: pendingAdaptFeedback || "Progress the routine to the next level",
           }),
         });
 
         if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
         const data = await res.json();
-        const planText = formatPlanResponse(data);
-        addMessage("assistant", planText);
-        if (data.plan) setLastGeneratedPlan(data.plan);
+        const text = formatRoutineResponse(data);
+        addMessage("assistant", text);
+        if (data.routine) setLastGeneratedRoutine(data.routine);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Unknown error";
-        addMessage("assistant", `Sorry, I couldn't adapt the plan. ${message}`);
+        addMessage("assistant", `Sorry, I couldn't adapt the routine. ${message}`);
       } finally {
         setIsLoading(false);
       }
@@ -248,8 +286,8 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            plan: currentPlan,
-            profile: context?.profile,
+            routine: routineData,
+            profile: profileForApi(),
           }),
         });
 
@@ -258,7 +296,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
         addMessage("assistant", data.explanation || JSON.stringify(data));
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Unknown error";
-        addMessage("assistant", `Sorry, I couldn't explain the plan. ${message}`);
+        addMessage("assistant", `Sorry, I couldn't explain the routine. ${message}`);
       } finally {
         setIsLoading(false);
       }
@@ -273,31 +311,47 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
     setInput("");
     setIsLoading(true);
 
-    // Detect intent from the message
     const lower = trimmed.toLowerCase();
+    const isAdaptIntent = lower.includes("adapt") || lower.includes("change") || lower.includes("modify") || lower.includes("replace") || lower.includes("swap") || lower.includes("remove") || lower.includes("switch") || lower.includes("add");
     try {
-      if (lower.includes("generate") || lower.includes("create") || lower.includes("new plan")) {
+      if (lower.includes("generate") || lower.includes("create") || lower.includes("new routine") || lower.includes("new workout")) {
         const res = await fetch("/api/plans/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId: "current",
-            profile: context?.profile || { goal: "strength", experience: "beginner" },
+            profile: profileForApi(),
             history: [],
           }),
         });
         if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
         const data = await res.json();
-        addMessage("assistant", formatPlanResponse(data));
-      } else if (lower.includes("adapt") || lower.includes("change") || lower.includes("modify")) {
-        // Fetch routines and show picker
+        addMessage("assistant", formatRoutineResponse(data));
+        if (data.routine) setLastGeneratedRoutine(data.routine);
+      } else if (lastGeneratedRoutine && (isAdaptIntent || !lower.includes("explain"))) {
+        // If we have a recent routine, treat the message as feedback to refine it
+        const res = await fetch("/api/plans/adapt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: "current",
+            profile: profileForApi(),
+            currentRoutine: lastGeneratedRoutine,
+            feedback: trimmed,
+          }),
+        });
+        if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
+        const data = await res.json();
+        addMessage("assistant", formatRoutineResponse(data));
+        if (data.routine) setLastGeneratedRoutine(data.routine);
+      } else if (isAdaptIntent) {
         const routinesRes = await fetch("/api/routines");
         if (!routinesRes.ok) throw new Error(`Failed: ${routinesRes.statusText}`);
         const routinesData = await routinesRes.json();
         const routines: RoutineSummary[] = routinesData.routines || [];
 
         if (routines.length === 0) {
-          addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
+          addMessage("assistant", "You don't have any routines yet. Try generating one first!");
         } else {
           addMessage("assistant", "Which routine would you like me to adapt? Pick one below:");
           setRoutinePickerItems(routines);
@@ -305,14 +359,13 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
           setPendingAdaptFeedback(trimmed);
         }
       } else if (lower.includes("explain") || lower.includes("why") || lower.includes("what does")) {
-        // Fetch routines and show picker for explain
         const routinesRes = await fetch("/api/routines");
         if (!routinesRes.ok) throw new Error(`Failed: ${routinesRes.statusText}`);
         const routinesData = await routinesRes.json();
         const routines: RoutineSummary[] = routinesData.routines || [];
 
         if (routines.length === 0) {
-          addMessage("assistant", "You don't have any routines yet. Try generating a plan first!");
+          addMessage("assistant", "You don't have any routines yet. Try generating one first!");
         } else {
           addMessage("assistant", "Which routine would you like me to explain? Pick one below:");
           setRoutinePickerItems(routines);
@@ -321,7 +374,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
       } else {
         addMessage(
           "assistant",
-          "I can help you generate a new plan, adapt an existing one, or explain a plan. Try the quick actions above, or ask me something specific!"
+          "I can help you generate a new routine, adapt an existing one, or explain a routine. Try the quick actions above, or ask me something specific!"
         );
       }
     } catch (err: unknown) {
@@ -343,7 +396,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
           <div>
             <h3 className="text-sm font-semibold">AI Assistant</h3>
             <p className="text-xs text-muted-foreground">
-              Generate, adapt, or explain plans
+              Generate, adapt, or explain routines
             </p>
           </div>
         </div>
@@ -353,7 +406,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
       <div className="border-b p-3">
         <div className="flex gap-2">
           <button
-            onClick={handleGeneratePlan}
+            onClick={handleGenerateRoutine}
             disabled={isLoading}
             className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border bg-background px-3 py-2 text-xs font-medium hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -361,7 +414,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
             Generate
           </button>
           <button
-            onClick={handleAdaptPlan}
+            onClick={handleAdaptRoutine}
             disabled={isLoading}
             className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border bg-background px-3 py-2 text-xs font-medium hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -369,7 +422,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
             Adapt
           </button>
           <button
-            onClick={handleExplainPlan}
+            onClick={handleExplainRoutine}
             disabled={isLoading}
             className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border bg-background px-3 py-2 text-xs font-medium hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -422,20 +475,29 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
           </div>
         )}
 
-        {lastGeneratedPlan && !isLoading && (
-          <div className="flex justify-center">
-            <button
-              onClick={handleSaveAsRoutine}
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              {isSaving ? "Saving..." : "Save as Routine"}
-            </button>
+        {lastGeneratedRoutine && !isLoading && (
+          <div className="space-y-3 px-1">
+            {lastGeneratedRoutine.exercises.map((ex) => (
+              <RoutineExerciseCard
+                key={ex.order_index}
+                exercise={ex}
+                onChange={(updated) => handleUpdateExercise(ex.order_index, updated)}
+              />
+            ))}
+            <div className="flex justify-center pt-1">
+              <button
+                onClick={handleSaveAsRoutine}
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                {isSaving ? "Saving..." : "Save as Routine"}
+              </button>
+            </div>
           </div>
         )}
 
@@ -466,7 +528,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
                 handleSendMessage();
               }
             }}
-            placeholder="Ask about your plan..."
+            placeholder="Ask about your routine..."
             disabled={isLoading}
             className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
           />
@@ -483,56 +545,28 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
   );
 }
 
-function routineToWorkoutPlan(routine: RoutineSummary): WorkoutPlan {
-  // Group exercises by day prefix (e.g. "Mon - Squat" → day "Mon")
-  // If no day prefix, group all under "Workout"
-  const dayMap = new Map<string, Exercise[]>();
-
-  for (const ex of routine.routine_exercises) {
-    const dashIndex = ex.exercise_name.indexOf(" - ");
-    let dayLabel: string;
-    let exerciseName: string;
-
-    if (dashIndex > -1) {
-      dayLabel = ex.exercise_name.substring(0, dashIndex);
-      exerciseName = ex.exercise_name.substring(dashIndex + 3);
-    } else {
-      dayLabel = "Workout";
-      exerciseName = ex.exercise_name;
-    }
-
-    const sets = ex.sets_data?.length || 1;
-    const reps = ex.sets_data?.[0]?.target_reps || 10;
-
-    if (!dayMap.has(dayLabel)) dayMap.set(dayLabel, []);
-    dayMap.get(dayLabel)!.push({ name: exerciseName, sets, reps });
-  }
-
-  const days: PlanDay[] = Array.from(dayMap.entries()).map(([day, workout]) => ({
-    day,
-    workout,
-  }));
-
-  return { version: 1, days };
+function routineSummaryToRoutineData(routine: RoutineSummary): GeneratedRoutine {
+  return {
+    name: routine.name,
+    description: routine.description || undefined,
+    exercises: routine.routine_exercises.map((ex) => ({
+      exercise_name: ex.exercise_name,
+      sets_data: ex.sets_data || [{ set_index: 1, target_reps: 10, target_weight_kg: null }],
+      rest_seconds: ex.rest_seconds,
+      order_index: ex.order_index,
+    })),
+  };
 }
 
-function formatPlanResponse(data: { plan?: WorkoutPlan; explanation?: string }): string {
+function formatRoutineResponse(data: { routine?: GeneratedRoutine; explanation?: string }): string {
   if (data.explanation) return data.explanation;
 
-  // Format a plan object into readable text
-  const plan = data.plan;
-  if (plan?.days && Array.isArray(plan.days)) {
-    let text = `Here's your workout plan (v${plan.version || 1}):\n\n`;
-    for (const day of plan.days) {
-      text += `${day.day}:\n`;
-      if (day.workout && Array.isArray(day.workout)) {
-        for (const ex of day.workout) {
-          text += `  - ${ex.name}: ${ex.sets} sets x ${ex.reps} reps\n`;
-        }
-      }
-      text += "\n";
-    }
-    return text.trim();
+  const routine = data.routine;
+  if (routine?.exercises && Array.isArray(routine.exercises)) {
+    let text = `Here's your workout routine: "${routine.name}"`;
+    if (routine.description) text += `\n${routine.description}`;
+    text += `\n\n${routine.exercises.length} exercises — edit details below, then save when ready.`;
+    return text;
   }
 
   return JSON.stringify(data, null, 2);
