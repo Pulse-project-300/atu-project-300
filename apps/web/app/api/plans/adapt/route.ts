@@ -16,15 +16,14 @@ export async function POST(req: NextRequest) {
     // Fetch recent workout logs (filtered by routine if provided)
     const { logs } = await fetchRecentWorkoutLogs(body.routineId);
 
-    // Rename currentPlan → currentRoutine for the new API
-    const { currentPlan, currentVersion, routineId, ...rest } = body;
+    const { currentRoutine, ...rest } = body;
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const res = await fetch(`${apiBase}/routines/adapt`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...rest,
-        currentRoutine: currentPlan || body.currentRoutine,
+        currentRoutine,
         available_exercises: exercises,
         recentLogs: logs.length > 0 ? logs : (rest.recentLogs || []),
       }),
