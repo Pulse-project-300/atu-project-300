@@ -1,35 +1,51 @@
 from fastapi import APIRouter, HTTPException
-from app.models.request import GenerateRequest, ExplainRequest
-from app.core.openai_client import explain_plan
+from app.models.request import GenerateRequest, AdaptRequest, ExplainRequest
+from app.core.openai_client import generate_plan, adapt_plan, explain_plan
 
 router = APIRouter(tags=["plan"])
 
-# Placeholder for plan generation logic
+
 @router.post("/generate")
-def generate_plan(req: GenerateRequest):
-    # Placeholder plan (will replace with Langflow/OpenAI call)
-    plan = {
-        "version": 1,
-        "days": [
-            {"day": "Mon", "workout": [{"name":"Squat","sets":3,"reps":10}]},
-            {"day": "Wed", "workout": [{"name":"Bench","sets":3,"reps":10}]},
-            {"day": "Fri", "workout": [{"name":"Deadlift","sets":3,"reps":5}]}
-        ]
-    }
-    return {"plan": plan, "userId": req.userId}
+async def generate_plan_endpoint(req: GenerateRequest):
+    """
+    Generate a new AI-powered workout plan.
+
+    Uses OpenAI's GPT model to create a structured, personalised workout plan
+    based on the user's profile and optional workout history.
+    """
+    try:
+        plan = await generate_plan(req.profile, req.history or [])
+        return {"plan": plan, "userId": req.userId}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate plan: {str(e)}"
+        )
+
 
 @router.post("/adapt")
-def adapt_plan(req: GenerateRequest):
-    # Placeholder adapted plan (will replace with Langflow/OpenAI call)
-    adapted_plan = {
-        "version": 2,
-        "days": [
-            {"day": "Mon", "workout": [{"name":"Squat","sets":4,"reps":8}]},
-            {"day": "Wed", "workout": [{"name":"Bench","sets":4,"reps":8}]},
-            {"day": "Fri", "workout": [{"name":"Deadlift","sets":4,"reps":4}]}
-        ]
-    }
-    return {"plan": adapted_plan, "userId": req.userId}
+async def adapt_plan_endpoint(req: AdaptRequest):
+    """
+    Adapt an existing workout plan based on user feedback and progress.
+
+    Uses OpenAI's GPT model to intelligently modify the current plan
+    according to feedback, recent logs, and user profile.
+    """
+    try:
+        plan = await adapt_plan(
+            profile=req.profile,
+            current_plan=req.currentPlan,
+            feedback=req.feedback,
+            current_version=req.currentVersion,
+            recent_logs=req.recentLogs or [],
+        )
+        return {"plan": plan, "userId": req.userId}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to adapt plan: {str(e)}"
+        )
+
 
 @router.post("/explain")
 async def explain_plan_endpoint(req: ExplainRequest):
@@ -38,23 +54,12 @@ async def explain_plan_endpoint(req: ExplainRequest):
 
     Uses OpenAI's GPT model to create a detailed, personalized explanation
     that helps users understand their workout plan's purpose and benefits.
-
-    Args:
-        req: ExplainRequest containing the plan and optional user context
-
-    Returns:
-        Dict with the AI-generated explanation
-
-    Raises:
-        HTTPException: If the OpenAI API call fails
     """
     try:
-        # Call OpenAI to generate the explanation
         explanation = await explain_plan(req.plan, req.profile)
         return {"explanation": explanation}
     except Exception as e:
-        # Handle API errors gracefully
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate explanation: {str(e)}"
-        ) 
+        )
