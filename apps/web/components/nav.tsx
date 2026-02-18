@@ -7,7 +7,6 @@ import {
   Dumbbell,
   TrendingUp,
   Trophy,
-  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
@@ -18,7 +17,7 @@ const navItems = [
   { href: "/routines", label: "Routines", icon: Dumbbell },
   { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/achievements", label: "Achieve", icon: Trophy },
-  { href: "/ai-assistant", label: "AI", icon: Sparkles },
+
 ];
 
 interface NavProps {
