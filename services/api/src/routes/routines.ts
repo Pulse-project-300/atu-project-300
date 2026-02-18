@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import { generatePlan, adaptPlan, getPlanExplanation } from "../clients/aiClient.js";
+import { generateRoutine, adaptRoutine, getRoutineExplanation } from "../clients/aiClient.js";
 
 const router: Router = Router();
 
@@ -8,25 +8,26 @@ const router: Router = Router();
 const GenerateSchema = z.object({
   userId: z.string(),
   profile: z.record(z.any()),
+  available_exercises: z.array(z.record(z.any())),
   history: z.array(z.record(z.any())).optional(),
 });
 
 const AdaptSchema = z.object({
   userId: z.string(),
   profile: z.record(z.any()),
-  currentPlan: z.record(z.any()),
+  currentRoutine: z.record(z.any()),
+  available_exercises: z.array(z.record(z.any())),
   recentLogs: z.array(z.record(z.any())).optional(),
   feedback: z.string().optional(),
-  currentVersion: z.number().optional(),
 });
 
 const ExplainSchema = z.object({
-  plan: z.record(z.any()),
+  routine: z.record(z.any()),
   userId: z.string().optional(),
   profile: z.record(z.any()).optional(),
 });
 
-// POST /plans/generate
+// POST /routines/generate
 router.post("/generate", async (req: Request, res: Response) => {
   let input;
   try {
@@ -36,16 +37,16 @@ router.post("/generate", async (req: Request, res: Response) => {
     return;
   }
   try {
-    const data = await generatePlan(input);
+    const data = await generateRoutine(input);
     res.json(data);
   } catch (err: unknown) {
-    console.error("Error in /plans/generate:", err);
+    console.error("Error in /routines/generate:", err);
     const message = err instanceof Error ? err.message : "AI service error";
     res.status(502).json({ error: `AI service failed: ${message}` });
   }
 });
 
-// POST /plans/adapt
+// POST /routines/adapt
 router.post("/adapt", async (req: Request, res: Response) => {
   let input;
   try {
@@ -55,16 +56,16 @@ router.post("/adapt", async (req: Request, res: Response) => {
     return;
   }
   try {
-    const data = await adaptPlan(input);
+    const data = await adaptRoutine(input);
     res.json(data);
   } catch (err: unknown) {
-    console.error("Error in /plans/adapt:", err);
+    console.error("Error in /routines/adapt:", err);
     const message = err instanceof Error ? err.message : "AI service error";
     res.status(502).json({ error: `AI service failed: ${message}` });
   }
 });
 
-// POST /plans/explain
+// POST /routines/explain
 router.post("/explain", async (req: Request, res: Response) => {
   let input;
   try {
@@ -74,10 +75,10 @@ router.post("/explain", async (req: Request, res: Response) => {
     return;
   }
   try {
-    const data = await getPlanExplanation(input);
+    const data = await getRoutineExplanation(input);
     res.json(data);
   } catch (err: unknown) {
-    console.error("Error in /plans/explain:", err);
+    console.error("Error in /routines/explain:", err);
     const message = err instanceof Error ? err.message : "AI service error";
     res.status(502).json({ error: `AI service failed: ${message}` });
   }
