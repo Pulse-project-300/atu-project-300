@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createRoutine } from "@/app/(app)/routines/actions";
-import type { CreateRoutineExerciseInput, RoutineSetData } from "@/lib/types/routines";
+import type { CreateRoutineExerciseInput } from "@/lib/types/routines";
 
-interface PlanExercise {
-  name: string;
-  sets: number;
-  reps: number;
-}
-
-interface PlanDay {
-  day: string;
-  workout: PlanExercise[];
+interface RoutineExerciseFromAI {
+  exercise_name: string;
+  exercise_library_id?: string;
+  sets_data: { set_index: number; target_reps: number | null; target_weight_kg: number | null }[];
+  rest_seconds: number;
+  order_index: number;
+  notes?: string;
 }
 
 interface SaveRoutineBody {
-  plan: {
-    version?: number;
-    days: PlanDay[];
+  routine: {
+    name: string;
+    description?: string;
+    exercises: RoutineExerciseFromAI[];
   };
   name?: string;
 }
@@ -24,46 +23,29 @@ interface SaveRoutineBody {
 export async function POST(req: NextRequest) {
   try {
     const body: SaveRoutineBody = await req.json();
-    const { plan, name } = body;
+    const { routine, name } = body;
 
-    if (!plan?.days || !Array.isArray(plan.days)) {
-      return NextResponse.json({ error: "Invalid plan data" }, { status: 400 });
+    if (!routine?.exercises || !Array.isArray(routine.exercises)) {
+      return NextResponse.json({ error: "Invalid routine data" }, { status: 400 });
     }
 
-    // Auto-generate routine name from the plan's days if not provided
-    const dayNames = plan.days.map((d) => d.day).join("/");
-    const routineName = name || `AI Plan (${dayNames})`;
+    const routineName = name || routine.name || "AI Routine";
 
-    // Convert AI plan exercises to CreateRoutineExerciseInput format
-    const exercises: CreateRoutineExerciseInput[] = [];
-
-    for (const day of plan.days) {
-      if (!day.workout || !Array.isArray(day.workout)) continue;
-
-      for (const ex of day.workout) {
-        const setsData: RoutineSetData[] = Array.from(
-          { length: ex.sets },
-          (_, i) => ({
-            set_index: i,
-            target_reps: ex.reps,
-            target_weight_kg: null,
-          })
-        );
-
-        exercises.push({
-          exercise_name: `${day.day} - ${ex.name}`,
-          target_sets: ex.sets,
-          target_reps: ex.reps,
-          rest_seconds: 60,
-          sets_data: setsData,
-        });
-      }
-    }
+    // Map AI-generated exercises directly to CreateRoutineExerciseInput
+    const exercises: CreateRoutineExerciseInput[] = routine.exercises.map((ex) => ({
+      exercise_library_id: ex.exercise_library_id,
+      exercise_name: ex.exercise_name,
+      target_sets: ex.sets_data.length,
+      target_reps: ex.sets_data[0]?.target_reps ?? undefined,
+      rest_seconds: ex.rest_seconds,
+      notes: ex.notes,
+      sets_data: ex.sets_data,
+    }));
 
     const result = await createRoutine(
       routineName,
       exercises,
-      `AI-generated workout plan (v${plan.version || 1})`
+      routine.description || "AI-generated workout routine"
     );
 
     if (!result.success) {
