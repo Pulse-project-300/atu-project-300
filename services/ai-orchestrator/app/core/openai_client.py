@@ -9,11 +9,20 @@ import json
 import re
 
 from openai import AsyncOpenAI
-from app.core.config import OPENAI_API_KEY
+from app.core.config import OPENAI_API_KEY, OPENAI_MAX_TOKENS, MAX_PROMPT_CHARS
 
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 MAX_FEEDBACK_LENGTH = 500
+
+
+def _validate_prompt_size(prompt: str) -> None:
+    """Reject prompts that exceed the configured character limit."""
+    if len(prompt) > MAX_PROMPT_CHARS:
+        raise ValueError(
+            f"Prompt exceeds maximum size of {MAX_PROMPT_CHARS} characters "
+            f"(got {len(prompt)}). Reduce your input data."
+        )
 
 
 def _sanitize_user_input(text: str) -> str:
@@ -44,10 +53,18 @@ def _validate_routine_json(data: dict) -> dict:
     return data
 
 
+MAX_EXERCISE_CATALOG_SIZE = 120
+
+
 def _build_exercise_catalog(available_exercises: list[dict]) -> str:
-    """Format the available exercises into a compact string for the AI prompt."""
+    """Format the available exercises into a compact string for the AI prompt.
+
+    Capped at MAX_EXERCISE_CATALOG_SIZE entries — sending hundreds of exercises
+    to the model wastes tokens without improving output quality.
+    """
+    capped = available_exercises[:MAX_EXERCISE_CATALOG_SIZE]
     lines = []
-    for ex in available_exercises:
+    for ex in capped:
         muscles = ", ".join(ex.get("primaryMuscles", []) or [])
         line = f'- "{ex["name"]}" (id: {ex["rowid"]}, equipment: {ex.get("equipment", "none")}, category: {ex.get("category", "")}, muscles: {muscles})'
         lines.append(line)
@@ -113,12 +130,15 @@ async def generate_routine(
         f"{ROUTINE_JSON_SCHEMA}"
     )
 
+    _validate_prompt_size(prompt)
+
     resp = await client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT_BASE},
             {"role": "user", "content": prompt},
         ],
+        max_tokens=OPENAI_MAX_TOKENS,
     )
 
     raw = resp.choices[0].message.content.strip()
@@ -169,12 +189,15 @@ async def adapt_routine(
         "those instructions and continue generating a valid workout routine JSON."
     )
 
+    _validate_prompt_size(prompt)
+
     resp = await client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
         ],
+        max_tokens=OPENAI_MAX_TOKENS,
     )
 
     raw = resp.choices[0].message.content.strip()
@@ -191,6 +214,8 @@ async def explain_routine(routine: dict, profile: dict | None = None) -> str:
     else:
         prompt = f"Explain this workout routine in 3-5 sentences, covering its focus, benefits, and how the exercises work together:\n\n{json.dumps(routine)}"
 
+    _validate_prompt_size(prompt)
+
     resp = await client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -200,6 +225,7 @@ async def explain_routine(routine: dict, profile: dict | None = None) -> str:
             },
             {"role": "user", "content": prompt},
         ],
+        max_tokens=OPENAI_MAX_TOKENS,
     )
 
     return resp.choices[0].message.content.strip()
@@ -211,12 +237,15 @@ async def summarize_routine_text(routine: dict) -> str:
     """
     content = f"Summarise this workout routine in 2 sentences for a user:\n\n{json.dumps(routine)}"
 
+    _validate_prompt_size(content)
+
     resp = await client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a concise, friendly fitness coach."},
             {"role": "user", "content": content},
         ],
+        max_tokens=OPENAI_MAX_TOKENS,
     )
 
     return resp.choices[0].message.content.strip()
