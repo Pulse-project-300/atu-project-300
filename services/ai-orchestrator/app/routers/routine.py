@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from app.models.request import GenerateRequest, AdaptRequest, ExplainRequest
 from app.core.openai_client import generate_routine, adapt_routine, explain_routine
+from app.core.rate_limiter import require_rate_limit
 
 router = APIRouter(tags=["routine"])
 
 
-@router.post("/generate")
+@router.post("/generate", dependencies=[Depends(require_rate_limit)])
 async def generate_routine_endpoint(req: GenerateRequest):
     """
     Generate a new AI-powered workout routine.
@@ -20,6 +21,8 @@ async def generate_routine_endpoint(req: GenerateRequest):
             history=req.history or [],
         )
         return {"routine": routine, "userId": req.userId}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -27,7 +30,7 @@ async def generate_routine_endpoint(req: GenerateRequest):
         )
 
 
-@router.post("/adapt")
+@router.post("/adapt", dependencies=[Depends(require_rate_limit)])
 async def adapt_routine_endpoint(req: AdaptRequest):
     """
     Adapt an existing workout routine based on user feedback and progress.
@@ -44,6 +47,8 @@ async def adapt_routine_endpoint(req: AdaptRequest):
             recent_logs=req.recentLogs or [],
         )
         return {"routine": routine, "userId": req.userId}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -51,7 +56,7 @@ async def adapt_routine_endpoint(req: AdaptRequest):
         )
 
 
-@router.post("/explain")
+@router.post("/explain", dependencies=[Depends(require_rate_limit)])
 async def explain_routine_endpoint(req: ExplainRequest):
     """
     Generate an AI-powered explanation of a workout routine.
@@ -59,6 +64,8 @@ async def explain_routine_endpoint(req: ExplainRequest):
     try:
         explanation = await explain_routine(req.routine, req.profile)
         return {"explanation": explanation}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=500,
