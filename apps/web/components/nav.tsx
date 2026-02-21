@@ -9,6 +9,8 @@ import {
   TrendingUp,
   Trophy,
   Sparkles,
+  HeartPulse,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
@@ -19,7 +21,7 @@ import { AIAssistantDrawer } from "@/components/ai-assistant/ai-assistant-drawer
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/routines", label: "Routines", icon: Dumbbell },
-  { href: "/progress", label: "Progress", icon: TrendingUp },
+  { href: "/analytics", label: "Analytics", icon: TrendingUp },
   { href: "/achievements", label: "Achieve", icon: Trophy },
 
 ];
@@ -38,8 +40,8 @@ export function Nav({ authButton }: NavProps) {
       <nav className="hidden md:flex w-full justify-center border-b border-b-foreground/10 h-16">
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center">
-            <Link href="/dashboard" className="font-bold text-lg text-foreground">
-              Pulse
+            <Link href="/dashboard" aria-label="Home">
+              <HeartPulse className="h-7 w-7 text-primary" />
             </Link>
             <div className="flex gap-4 text-muted-foreground">
               {navItems.map((item) => {
@@ -61,6 +63,9 @@ export function Nav({ authButton }: NavProps) {
           </div>
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
+            <Link href="/settings" aria-label="Settings" className="text-muted-foreground hover:text-primary transition-colors">
+              <Settings className="h-5 w-5" />
+            </Link>
             {authButton}
           </div>
         </div>
@@ -68,11 +73,14 @@ export function Nav({ authButton }: NavProps) {
 
       {/* Mobile: Top header (minimal) */}
       <header className="md:hidden w-full flex justify-between items-center p-4 border-b border-b-foreground/10">
-        <Link href="/dashboard" className="font-bold text-lg text-primary">
-          Pulse
+        <Link href="/dashboard" aria-label="Home">
+          <HeartPulse className="h-7 w-7 text-primary" />
         </Link>
         <div className="flex items-center gap-3">
           <ThemeSwitcher />
+          <Link href="/settings" aria-label="Settings" className="text-muted-foreground hover:text-primary transition-colors">
+            <Settings className="h-5 w-5" />
+          </Link>
           {authButton}
         </div>
       </header>

@@ -26,7 +26,7 @@ export default async function AppLayout({
           <Nav authButton={<AuthButton />} />
 
           {/* Main content - add bottom padding on mobile for the fixed nav */}
-          <div className="flex-1 flex flex-col w-full max-w-5xl p-5 pb-24 md:pb-5">
+          <div className="flex-1 flex flex-col w-full max-w-5xl p-5 pb-20 md:pb-5">
             {children}
           </div>
 

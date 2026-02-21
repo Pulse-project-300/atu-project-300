@@ -1,31 +1,22 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Play, Dumbbell, Clock } from "lucide-react";
 import Link from "next/link";
+import {
+  getDashboardRoutines,
+  type DashboardRoutine,
+} from "@/app/(app)/dashboard/actions";
 
 export function RoutinesList() {
-  // Mock data - showing realistic workout routines
-  const routines = [
-    {
-      id: 1,
-      name: "Upper Body Strength",
-      exercises: 8,
-      duration: "45 min",
-      lastCompleted: "2 days ago",
-    },
-    {
-      id: 2,
-      name: "Leg Day",
-      exercises: 6,
-      duration: "60 min",
-      lastCompleted: "4 days ago",
-    },
-    {
-      id: 3,
-      name: "Core & Cardio",
-      exercises: 10,
-      duration: "30 min",
-      lastCompleted: "Yesterday",
-    },
-  ];
+  const [routines, setRoutines] = useState<DashboardRoutine[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getDashboardRoutines()
+      .then(setRoutines)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
@@ -45,7 +36,22 @@ export function RoutinesList() {
       </div>
 
       <div className="space-y-3">
-        {routines.length === 0 ? (
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between rounded-lg border bg-card p-4 animate-pulse"
+            >
+              <div className="flex items-start gap-4 flex-1">
+                <div className="rounded-lg bg-muted-foreground/10 p-2.5 h-10 w-10" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-32 bg-muted-foreground/10 rounded" />
+                  <div className="h-3 w-48 bg-muted-foreground/10 rounded" />
+                </div>
+              </div>
+            </div>
+          ))
+        ) : routines.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="rounded-full bg-primary/10 p-4 mb-4">
               <Dumbbell className="h-8 w-8 text-primary" />
@@ -77,14 +83,12 @@ export function RoutinesList() {
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-sm mb-1">{routine.name}</h4>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {routine.duration}
-                    </span>
                     <span>{routine.exercises} exercises</span>
-                    <span className="hidden sm:inline">
-                      Last: {routine.lastCompleted}
-                    </span>
+                    {routine.lastCompleted && (
+                      <span className="hidden sm:inline">
+                        Last: {routine.lastCompleted}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
