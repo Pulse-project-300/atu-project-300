@@ -2,15 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Dumbbell,
   TrendingUp,
   Trophy,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import type { ReactNode } from "react";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { AIAssistantDrawer } from "@/components/ai-assistant/ai-assistant-drawer";
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -26,6 +30,7 @@ interface NavProps {
 
 export function Nav({ authButton }: NavProps) {
   const pathname = usePathname();
+  const [aiOpen, setAiOpen] = useState(false);
 
   return (
     <>
@@ -100,8 +105,25 @@ export function Nav({ authButton }: NavProps) {
               </Link>
             );
           })}
+
+          {/* AI Assistant nav item */}
+          <button
+            onClick={() => setAiOpen(true)}
+            className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all min-w-[4rem] text-muted-foreground"
+          >
+            <Sparkles className="h-5 w-5" strokeWidth={2} />
+            <span className="text-[10px] font-medium">AI</span>
+          </button>
         </div>
       </nav>
+
+      {/* AI Drawer (mobile) */}
+      <Sheet open={aiOpen} onOpenChange={setAiOpen}>
+        <SheetContent side="bottom" className="h-[85vh] w-full rounded-t-2xl p-0 flex flex-col">
+          <SheetTitle className="sr-only">AI Assistant</SheetTitle>
+          <AIAssistantDrawer />
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

@@ -21,10 +21,10 @@ export function AIAssistantFAB({ context }: AIAssistantFABProps) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      {/* FAB trigger */}
+      {/* Desktop-only FAB — hidden on mobile (nav handles it there) */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 md:bottom-8 md:right-8"
+        className="hidden md:flex fixed bottom-8 right-8 z-40 h-10 items-center gap-2 rounded-full bg-primary px-4 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95"
         aria-label="Open Pulse AI"
       >
         <Sparkles className="h-4 w-4" />
