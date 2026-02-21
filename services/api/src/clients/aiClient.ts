@@ -1,52 +1,50 @@
-import axios from "axios"; // HTTP client
-
-// AI Orchestrator service URL from env or default to localhost
+import axios from "axios";
 
 const AI_ORCHESTRATOR_URL =
   process.env.AI_ORCHESTRATOR_URL || "http://localhost:8001";
 
 /**
- * POST /plan/generate
+ * POST /routine/generate
  */
-export async function generatePlan(input: {
+export async function generateRoutine(input: {
   userId: string;
   profile: Record<string, any>;
+  available_exercises: Record<string, any>[];
   history?: Record<string, any>[];
 }) {
-  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/generate`, input, {
-    timeout: 15000,
+  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/routine/generate`, input, {
+    timeout: 30000,
   });
   return data;
 }
 
 /**
- * POST /plan/adapt
+ * POST /routine/adapt
  */
-export async function adaptPlan(input: {
+export async function adaptRoutine(input: {
   userId: string;
   profile: Record<string, any>;
-  currentPlan: Record<string, any>;
+  currentRoutine: Record<string, any>;
+  available_exercises: Record<string, any>[];
   recentLogs?: Record<string, any>[];
   feedback?: string;
-  currentVersion?: number;
 }) {
-  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/adapt`, input, {
-    timeout: 15000,
+  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/routine/adapt`, input, {
+    timeout: 30000,
   });
   return data;
 }
 
 /**
- * POST /plan/explain
- * Generate an AI-powered explanation of a workout plan
+ * POST /routine/explain
  */
-export async function getPlanExplanation(input: {
-  plan: Record<string, any>;
+export async function getRoutineExplanation(input: {
+  routine: Record<string, any>;
   userId?: string;
   profile?: Record<string, any>;
 }) {
-  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/plan/explain`, input, {
-    timeout: 15000,
+  const { data } = await axios.post(`${AI_ORCHESTRATOR_URL}/routine/explain`, input, {
+    timeout: 30000,
   });
   return data;
 }

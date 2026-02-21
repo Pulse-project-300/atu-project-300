@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { WeeklyChart } from "@/components/dashboard/weekly-chart";
 import { RoutinesList } from "@/components/dashboard/routines-list";
-import { AIChatWidget } from "@/components/dashboard/ai-chat-widget";
 import { BadgesWidget } from "@/components/dashboard/badges-widget";
+import { AIAssistantFAB } from "@/components/ai-assistant/ai-assistant-fab";
 import { getDashboardProfile } from "./actions";
 
 export default function DashboardPage() {
@@ -24,7 +24,7 @@ export default function DashboardPage() {
           Welcome back, <span className="text-primary">{displayName}</span>!
         </h1>
         <p className="text-muted-foreground">
-          Here's your fitness overview and quick actions
+          Here&apos;s your fitness overview and quick actions
         </p>
       </div>
 
@@ -43,8 +43,10 @@ export default function DashboardPage() {
         <BadgesWidget />
       </div>
 
-      {/* AI Chat Widget */}
-      <AIChatWidget />
+      {/* AI Chat Drawer */}
+     
+
+      <AIAssistantFAB />
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default async function AppLayout({
 
   return (
     <WorkoutWrapper>
-      <main className="min-h-screen flex flex-col items-center">
+      <main className="min-h-screen flex flex-col items-center overflow-x-hidden">
         <div className="flex-1 w-full flex flex-col items-center">
           <Nav authButton={<AuthButton />} />
 
