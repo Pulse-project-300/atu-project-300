@@ -297,6 +297,38 @@ export function WorkoutProvider({ children }: WorkoutProviderProps) {
       const result = await completeWorkoutAction(activeWorkout.workout.id);
       
       if (result.success) {
+
+        if (result.newBadges && result.newBadges.length > 0) {
+                const { toast } = await import("sonner");
+                
+                result.newBadges.forEach((badge: any, index: number) => {
+                  setTimeout(() => {
+                    toast.success(
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{badge.icon}</span>
+                        <div>
+                          <div className="font-semibold">Badge Earned!</div>
+                          <div className="text-sm">{badge.name}</div>
+                        </div>
+                      </div>,
+                      {
+                        duration: 5000,
+                        position: "top-center",
+                      }
+                    );
+                  }, index * 500);
+                });
+                
+                if (result.newBadges.length > 1) {
+                  setTimeout(() => {
+                    toast.success(`🎉 Earned ${result.newBadges?.length} badges!`, {
+                      duration: 4000,
+                      position: "top-center",
+                    });
+                  }, result.newBadges.length * 500 + 500);
+                }
+              }
+
         setActiveWorkout(null);
         setIsExpanded(false);
         setRestTimer(null);
