@@ -41,28 +41,11 @@ function eachDay(start: Date, end: Date) {
   return out;
 }
 
-function formatDuration(seconds: number | null) {
-  if (!seconds || seconds <= 0) return null;
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  if (h > 0) return `${h}h ${m}m`;
-  if (m > 0) return `${m}m`;
-  return `${s}s`;
-}
-
-const btnStyle: React.CSSProperties = {
-  padding: "8px 10px",
-  borderRadius: 10,
-  border: "1px solid #d1d5db",
-  background: "white",
-  cursor: "pointer",
-};
 
 export default function CalendarClient() {
   const tz = useMemo(getUserTimeZone, []);
   const [monthDate, setMonthDate] = useState(() => new Date());
-  const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
+  const [selectedDay, setSelectedDay] = useState<Date>(() => new Date());
 
   const [loadingMonth, setLoadingMonth] = useState(false);
   const [loadingDay, setLoadingDay] = useState(false);
@@ -70,26 +53,28 @@ export default function CalendarClient() {
   const [countsByDay, setCountsByDay] = useState<Record<string, number>>({});
   const [workoutsForDay, setWorkoutsForDay] = useState<WorkoutRow[]>([]);
 
-  // Month grid
+  // Month grid (desktop)
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
   const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
   const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-  const days = useMemo(() => eachDay(gridStart, gridEnd), [gridStart, gridEnd]);
+  const monthDays = useMemo(() => eachDay(gridStart, gridEnd), [gridStart, gridEnd]);
 
-  const selectedKey = selectedDay
-    ? format(
-        new Date(selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate()),
-        "yyyy-MM-dd"
-      )
-    : null;
+  // Week strip (mobile) based on selected day
+  const weekStart = startOfWeek(selectedDay, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(selectedDay, { weekStartsOn: 1 });
+  const weekDays = useMemo(() => eachDay(weekStart, weekEnd), [weekStart, weekEnd]);
+
+  const selectedKey = format(
+    new Date(selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate()),
+    "yyyy-MM-dd"
+  );
 
   async function loadMonthCounts(nextMonthDate: Date) {
     setLoadingMonth(true);
     setCountsByDay({});
 
-    const month = format(nextMonthDate, "yyyy-MM"); // e.g. "2026-02"
-
+    const month = format(nextMonthDate, "yyyy-MM");
     const res = await fetch(`/api/calendar/month?month=${month}&tz=${encodeURIComponent(tz)}`, {
       method: "GET",
       cache: "no-store",
@@ -115,10 +100,10 @@ export default function CalendarClient() {
       "yyyy-MM-dd"
     );
 
-    const res = await fetch(
-      `/api/calendar/day?day=${dayKey}&tz=${encodeURIComponent(tz)}`,
-      { method: "GET", cache: "no-store" }
-    );
+    const res = await fetch(`/api/calendar/day?day=${dayKey}&tz=${encodeURIComponent(tz)}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       console.error("Failed to load day workouts");
@@ -131,11 +116,9 @@ export default function CalendarClient() {
     setLoadingDay(false);
   }
 
-  // initial load + month changes
   useEffect(() => {
     loadMonthCounts(monthDate);
-    // also load selected day (defaults to today)
-    if (selectedDay) loadDayWorkouts(selectedDay);
+    loadDayWorkouts(selectedDay);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -144,40 +127,116 @@ export default function CalendarClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monthDate]);
 
-  return (
-    <div>
-      <Header
-        monthDate={monthDate}
-        onPrev={() => setMonthDate((d) => subMonths(d, 1))}
-        onNext={() => setMonthDate((d) => addMonths(d, 1))}
-        onToday={() => {
-          const today = new Date();
-          setMonthDate(today);
-          setSelectedDay(today);
-          loadDayWorkouts(today);
-        }}
-      />
+  // If you change selected day into a different month, keep header month in sync
+  useEffect(() => {
+    if (!isSameMonth(selectedDay, monthDate)) {
+      setMonthDate(new Date(selectedDay));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDay]);
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
-        {/* Calendar */}
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" }}>
-          <WeekdayRow />
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setMonthDate((d) => subMonths(d, 1))}
+          className="rounded-md border border-border bg-card px-3 py-2 text-sm hover:bg-muted"
+        >
+          ←
+        </button>
+
+        <div className="min-w-[140px] text-base font-extrabold sm:min-w-[220px] sm:text-lg">
+          {format(monthDate, "MMMM yyyy")}
+        </div>
+
+        <button
+          onClick={() => setMonthDate((d) => addMonths(d, 1))}
+          className="rounded-md border border-border bg-card px-3 py-2 text-sm hover:bg-muted"
+        >
+          →
+        </button>
+
+        <div className="flex-1" />
+
+        <button
+          onClick={() => {
+            const today = new Date();
+            setMonthDate(today);
+            setSelectedDay(today);
+            loadDayWorkouts(today);
+          }}
+          className="rounded-md border border-border bg-card px-3 py-2 text-sm hover:bg-muted"
+        >
+          Today
+        </button>
+      </div>
+
+      {/* MOBILE: Week strip */}
+      <div className="rounded-xl border border-border bg-card p-3 md:hidden">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-sm font-semibold">{format(selectedDay, "PPP")}</div>
+          <div className="text-xs text-muted-foreground">{tz}</div>
+        </div>
+
+        <div className="grid grid-cols-7 gap-2">
+          {weekDays.map((day) => {
+            const key = format(day, "yyyy-MM-dd");
+            const count = countsByDay[key] ?? 0;
+            const isSelected = key === selectedKey;
+
+            return (
+              <button
+                key={key}
+                onClick={() => {
+                  setSelectedDay(day);
+                  loadDayWorkouts(day);
+                }}
+                className={[
+                  "flex flex-col items-center justify-center rounded-lg border px-1 py-2 transition-colors",
+                  "border-border hover:bg-muted",
+                  isSelected ? "bg-accent" : "bg-background",
+                ].join(" ")}
+                aria-label={`Select ${format(day, "PPP")}`}
+              >
+                <div className="text-[10px] font-semibold text-muted-foreground">
+                  {format(day, "EEE")}
+                </div>
+                <div className="text-sm font-semibold">{format(day, "d")}</div>
+                <div className="mt-1 h-1.5">
+                  {count > 0 ? (
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* DESKTOP: Month grid + Day panel side-by-side */}
+      <div className="hidden gap-4 md:grid md:grid-cols-3">
+        <div className="md:col-span-2 overflow-hidden rounded-xl border border-border bg-card">
+          <div className="grid grid-cols-7 border-b border-border bg-muted">
+            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+              <div
+                key={d}
+                className="border-r border-border px-3 py-2 text-xs font-semibold text-muted-foreground last:border-r-0"
+              >
+                {d}
+              </div>
+            ))}
+          </div>
 
           {loadingMonth ? (
-            <div style={{ padding: 16 }}>Loading month…</div>
+            <div className="p-4 text-sm text-muted-foreground">Loading month…</div>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
-                borderTop: "1px solid #e5e7eb",
-              }}
-            >
-              {days.map((day) => {
+            <div className="grid grid-cols-7">
+              {monthDays.map((day) => {
                 const inMonth = isSameMonth(day, monthDate);
                 const key = format(day, "yyyy-MM-dd");
                 const count = countsByDay[key] ?? 0;
-                const isSelected = selectedKey ? key === selectedKey : false;
+                const isSelected = key === selectedKey;
 
                 return (
                   <button
@@ -186,53 +245,29 @@ export default function CalendarClient() {
                       setSelectedDay(day);
                       loadDayWorkouts(day);
                     }}
-                    style={{
-                      minHeight: 88,
-                      padding: 10,
-                      textAlign: "left",
-                      border: "none",
-                      borderRight: "1px solid #e5e7eb",
-                      borderBottom: "1px solid #e5e7eb",
-                      background: isSelected ? "#eef2ff" : "white",
-                      opacity: inMonth ? 1 : 0.45,
-                      cursor: "pointer",
-                    }}
-                    aria-label={`Open workouts for ${format(day, "PPP")}`}
+                    className={[
+                      "min-h-[92px] border-b border-r border-border p-3 text-left transition-colors",
+                      "hover:bg-muted",
+                      isSelected ? "bg-accent" : "bg-card",
+                      inMonth ? "" : "opacity-50",
+                    ].join(" ")}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                      <div style={{ fontWeight: 600 }}>{format(day, "d")}</div>
-
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="text-sm font-semibold">{format(day, "d")}</div>
                       {count > 0 && (
-                        <div
-                          title={`${count} workout${count === 1 ? "" : "s"} completed`}
-                          style={{
-                            fontSize: 12,
-                            padding: "2px 8px",
-                            borderRadius: 999,
-                            border: "1px solid #d1d5db",
-                          }}
-                        >
+                        <div className="rounded-full border border-border bg-background px-2 py-0.5 text-xs">
                           {count}
                         </div>
                       )}
                     </div>
 
                     {count > 0 && (
-                      <div style={{ marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         {Array.from({ length: Math.min(count, 3) }).map((_, i) => (
-                          <span
-                            key={i}
-                            style={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: 999,
-                              background: "#111827",
-                              display: "inline-block",
-                            }}
-                          />
+                          <span key={i} className="h-2 w-2 rounded-full bg-primary" />
                         ))}
                         {count > 3 && (
-                          <span style={{ fontSize: 12, color: "#374151" }}>+{count - 3}</span>
+                          <span className="text-xs text-muted-foreground">+{count - 3}</span>
                         )}
                       </div>
                     )}
@@ -243,118 +278,97 @@ export default function CalendarClient() {
           )}
         </div>
 
-        {/* Day panel */}
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 16 }}>
-            {selectedDay ? format(selectedDay, "PPP") : "Select a day"}
-          </h2>
+        <DayPanel
+          selectedDay={selectedDay}
+          loadingDay={loadingDay}
+          workoutsForDay={workoutsForDay}
+        />
+      </div>
 
-          <div style={{ marginTop: 12 }}>
-            {selectedDay && loadingDay && <div>Loading workouts…</div>}
-
-            {selectedDay && !loadingDay && workoutsForDay.length === 0 && (
-              <div style={{ color: "#6b7280" }}>No completed workouts logged.</div>
-            )}
-
-            {!loadingDay && workoutsForDay.length > 0 && (
-              <ul style={{ margin: 0, paddingLeft: 16 }}>
-                {workoutsForDay.map((w) => {
-                  const duration = formatDuration(w.duration_seconds);
-                  return (
-                    <li key={w.id} style={{ marginBottom: 12 }}>
-                      <div style={{ fontWeight: 700 }}>
-                        {w.name ?? "Workout"}
-                        {w.status ? (
-                          <span style={{ fontWeight: 500, color: "#6b7280", marginLeft: 8 }}>
-                            ({w.status})
-                          </span>
-                        ) : null}
-                      </div>
-
-                      <div style={{ color: "#374151", fontSize: 13, marginTop: 4 }}>
-                        {w.started_at ? (
-                          <span>Started {format(new Date(w.started_at), "p")}</span>
-                        ) : (
-                          <span>Started —</span>
-                        )}
-                        {" · "}
-                        {w.completed_at ? (
-                          <span>Completed {format(new Date(w.completed_at), "p")}</span>
-                        ) : (
-                          <span>Completed —</span>
-                        )}
-                        {duration ? <span>{" · "}{duration}</span> : null}
-                      </div>
-
-                      {w.notes ? (
-                        <div style={{ marginTop: 6, color: "#374151" }}>{w.notes}</div>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-
-          {selectedDay && isSameDay(selectedDay, new Date()) && (
-            <div style={{ marginTop: 12, fontSize: 12, color: "#6b7280" }}>
-              You’re viewing today.
-            </div>
-          )}
-        </div>
+      {/* MOBILE: Day panel below */}
+      <div className="md:hidden">
+        <DayPanel
+          selectedDay={selectedDay}
+          loadingDay={loadingDay}
+          workoutsForDay={workoutsForDay}
+        />
       </div>
     </div>
   );
 }
 
-function Header({
-  monthDate,
-  onPrev,
-  onNext,
-  onToday,
+function DayPanel({
+  selectedDay,
+  loadingDay,
+  workoutsForDay,
 }: {
-  monthDate: Date;
-  onPrev: () => void;
-  onNext: () => void;
-  onToday: () => void;
+  selectedDay: Date;
+  loadingDay: boolean;
+  workoutsForDay: WorkoutRow[];
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-      <button onClick={onPrev} style={btnStyle}>
-        ←
-      </button>
-      <div style={{ fontWeight: 800, fontSize: 18, minWidth: 220 }}>
-        {format(monthDate, "MMMM yyyy")}
+    <div className="rounded-xl border border-border bg-card p-4">
+      <h2 className="text-sm font-semibold">{format(selectedDay, "PPP")}</h2>
+
+      <div className="mt-3">
+        {loadingDay && <div className="text-sm text-muted-foreground">Loading workouts…</div>}
+
+        {!loadingDay && workoutsForDay.length === 0 && (
+          <div className="text-sm text-muted-foreground">No completed workouts logged.</div>
+        )}
+
+        {!loadingDay && workoutsForDay.length > 0 && (
+          <ul className="space-y-3">
+            {workoutsForDay.map((w) => {
+              const duration =
+                w.duration_seconds && w.duration_seconds > 0
+                  ? formatDuration(w.duration_seconds)
+                  : null;
+
+              return (
+                <li key={w.id} className="rounded-lg border border-border bg-background p-3">
+                  <div className="font-semibold">
+                    {w.name ?? "Workout"}
+                    {w.status ? (
+                      <span className="ml-2 font-normal text-muted-foreground">({w.status})</span>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    {w.started_at ? (
+                      <span>Started {format(new Date(w.started_at), "p")}</span>
+                    ) : (
+                      <span>Started —</span>
+                    )}
+                    {" · "}
+                    {w.completed_at ? (
+                      <span>Completed {format(new Date(w.completed_at), "p")}</span>
+                    ) : (
+                      <span>Completed —</span>
+                    )}
+                    {duration ? <span>{" · "}{duration}</span> : null}
+                  </div>
+
+                  {w.notes ? <div className="mt-2 text-sm">{w.notes}</div> : null}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
-      <button onClick={onNext} style={btnStyle}>
-        →
-      </button>
-      <div style={{ flex: 1 }} />
-      <button onClick={onToday} style={btnStyle}>
-        Today
-      </button>
+
+      {isSameDay(selectedDay, new Date()) && (
+        <div className="mt-4 text-xs text-muted-foreground">You’re viewing today.</div>
+      )}
     </div>
   );
 }
 
-function WeekdayRow() {
-  const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
-      {labels.map((d) => (
-        <div
-          key={d}
-          style={{
-            padding: 10,
-            fontSize: 12,
-            fontWeight: 700,
-            color: "#374151",
-            borderRight: "1px solid #e5e7eb",
-          }}
-        >
-          {d}
-        </div>
-      ))}
-    </div>
-  );
+function formatDuration(seconds: number) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${s}s`;
 }
