@@ -297,7 +297,7 @@ export function WorkoutProvider({ children }: WorkoutProviderProps) {
       const result = await completeWorkoutAction(activeWorkout.workout.id);
       
       if (result.success) {
-
+        //toast new badges if earned
         if (result.newBadges && result.newBadges.length > 0) {
                 const { toast } = await import("sonner");
                 
