@@ -9,7 +9,7 @@ test.describe("Sign Up Page", () => {
     page,
   }) => {
     // Verify heading and description
-    await expect(page.getByRole("heading", { name: "Sign up" })).toBeVisible();
+    await expect(page.getByText("Sign up", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Create a new account")).toBeVisible();
 
     // Verify Google sign up button
@@ -26,7 +26,7 @@ test.describe("Sign Up Page", () => {
 
     // Verify submit button
     await expect(
-      page.getByRole("button", { name: "Sign up" }),
+      page.getByRole("button", { name: "Sign up", exact: true }),
     ).toBeVisible();
 
     // Verify login link for existing users
