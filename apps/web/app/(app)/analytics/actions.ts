@@ -372,6 +372,69 @@ export async function getPersonalRecords(): Promise<PersonalRecord[]> {
   }));
 }
 
+export interface WorkoutHistoryDetail {
+  id: string;
+  name: string;
+  status: string;
+  started_at: string;
+  completed_at: string | null;
+  duration_seconds: number | null;
+  workout_sets: {
+    id: string;
+    exercise_name: string;
+    exercise_library_id: string | null;
+    set_index: number;
+    weight_kg: number | null;
+    reps: number | null;
+    completed: boolean;
+    rpe: number | null;
+    set_type: string;
+    completed_at: string | null;
+  }[];
+}
+
+export async function getWorkoutDetail(workoutId: string): Promise<WorkoutHistoryDetail | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("workouts")
+    .select(`
+      id,
+      name,
+      status,
+      started_at,
+      completed_at,
+      duration_seconds,
+      workout_sets (
+        id,
+        exercise_name,
+        exercise_library_id,
+        set_index,
+        weight_kg,
+        reps,
+        completed,
+        rpe,
+        set_type,
+        completed_at
+      )
+    `)
+    .eq("id", workoutId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error || !data) {
+    console.error("Failed to fetch workout detail:", error);
+    return null;
+  }
+
+  return data as WorkoutHistoryDetail;
+}
+
 export async function getWorkoutHistory(): Promise<WorkoutHistoryItem[]> {
   const supabase = await createClient();
   const {
