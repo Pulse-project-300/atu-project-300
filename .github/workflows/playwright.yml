@@ -39,7 +39,7 @@ jobs:
         echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > apps/web/.env.local
         echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> apps/web/.env.local
     - name: Run Playwright tests
-      run: pnpm exec playwright test tests/end2end/login.spec.ts
+      run: pnpm exec playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
