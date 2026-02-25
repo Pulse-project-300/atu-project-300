@@ -388,7 +388,7 @@ export async function completeWorkout(workoutId: string): Promise<ActionResult> 
 
     revalidatePath("/routines");
     revalidatePath("/dashboard");
-    revalidatePath("/progress");
+    revalidatePath("/analytics");
     revalidatePath("/achievements");
 
     return { 
