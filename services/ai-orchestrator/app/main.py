@@ -15,8 +15,11 @@ logger = logging.getLogger("pulse.app")
 async def lifespan(app: FastAPI):
     """Manage startup/shutdown resources (Redis pool)."""
     logger.info("Starting Pulse AI Orchestrator — connecting to Redis")
-    await init_redis()
-    logger.info("Redis connected")
+    try:
+        await init_redis()
+        logger.info("Redis connected")
+    except Exception as e:
+        logger.warning("Redis unavailable (%s) — rate limiting disabled", e)
     yield
     logger.info("Shutting down — closing Redis pool")
     await close_redis()
