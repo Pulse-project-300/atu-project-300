@@ -173,6 +173,7 @@ export function AIAssistantDrawer({ context }: AIAssistantDrawerProps) {
 
       if (!res.ok) throw new Error(`Failed: ${res.statusText}`);
       await res.json();
+      window.dispatchEvent(new CustomEvent("pulse:routine-saved"));
       addMessage("assistant", "Routine saved successfully! Redirecting to your routines...");
       setLastGeneratedRoutine(null);
       router.push("/routines");
