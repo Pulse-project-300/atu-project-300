@@ -1,0 +1,7 @@
+providers = ["node"]
+
+[phases.build]
+cmds = ["pnpm install --frozen-lockfile", "pnpm build"]
+
+[start]
+cmd = "node dist/index.js"
