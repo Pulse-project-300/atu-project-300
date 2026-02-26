@@ -11,6 +11,7 @@ import {
   Sparkles,
   HeartPulse,
   Settings,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
@@ -21,9 +22,9 @@ import { AIAssistantDrawer } from "@/components/ai-assistant/ai-assistant-drawer
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/routines", label: "Routines", icon: Dumbbell },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/analytics", label: "Analytics", icon: TrendingUp },
   { href: "/achievements", label: "Achieve", icon: Trophy },
-
 ];
 
 interface NavProps {

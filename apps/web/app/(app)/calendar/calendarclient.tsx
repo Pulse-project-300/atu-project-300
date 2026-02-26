@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   addDays,
   addMonths,
@@ -54,23 +54,27 @@ export default function CalendarClient() {
   const [workoutsForDay, setWorkoutsForDay] = useState<WorkoutRow[]>([]);
 
   // Month grid (desktop)
-  const monthStart = startOfMonth(monthDate);
-  const monthEnd = endOfMonth(monthDate);
-  const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-  const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-  const monthDays = useMemo(() => eachDay(gridStart, gridEnd), [gridStart, gridEnd]);
+  const monthDays = useMemo(() => {
+    const monthStart = startOfMonth(monthDate);
+    const monthEnd = endOfMonth(monthDate);
+    const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    return eachDay(gridStart, gridEnd);
+  }, [monthDate]);
 
   // Week strip (mobile) based on selected day
-  const weekStart = startOfWeek(selectedDay, { weekStartsOn: 1 });
-  const weekEnd = endOfWeek(selectedDay, { weekStartsOn: 1 });
-  const weekDays = useMemo(() => eachDay(weekStart, weekEnd), [weekStart, weekEnd]);
+  const weekDays = useMemo(() => {
+    const weekStart = startOfWeek(selectedDay, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(selectedDay, { weekStartsOn: 1 });
+    return eachDay(weekStart, weekEnd);
+  }, [selectedDay]);
 
   const selectedKey = format(
     new Date(selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate()),
     "yyyy-MM-dd"
   );
 
-  async function loadMonthCounts(nextMonthDate: Date) {
+  const loadMonthCounts = useCallback(async (nextMonthDate: Date) => {
     setLoadingMonth(true);
     setCountsByDay({});
 
@@ -89,9 +93,9 @@ export default function CalendarClient() {
     const json = (await res.json()) as { countsByDay: Record<string, number> };
     setCountsByDay(json.countsByDay ?? {});
     setLoadingMonth(false);
-  }
+  }, [tz]);
 
-  async function loadDayWorkouts(day: Date) {
+  const loadDayWorkouts = useCallback(async (day: Date) => {
     setLoadingDay(true);
     setWorkoutsForDay([]);
 
@@ -114,18 +118,16 @@ export default function CalendarClient() {
     const json = (await res.json()) as { workouts: WorkoutRow[] };
     setWorkoutsForDay(json.workouts ?? []);
     setLoadingDay(false);
-  }
+  }, [tz]);
 
   useEffect(() => {
-    loadMonthCounts(monthDate);
     loadDayWorkouts(selectedDay);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     loadMonthCounts(monthDate);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monthDate]);
+  }, [monthDate, loadMonthCounts]);
 
   // If you change selected day into a different month, keep header month in sync
   useEffect(() => {
