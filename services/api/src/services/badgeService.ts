@@ -1,4 +1,4 @@
-import { supabase } from "../clients/supabaseClient";
+import { supabase } from "../clients/supabaseClient.js";
 import type { Badge, UserBadge, BadgeCriteria } from "../types/badges";
 import type { BadgeCheckResult, WorkoutStats } from "../types/badges";
 
