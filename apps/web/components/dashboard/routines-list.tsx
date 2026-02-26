@@ -18,6 +18,14 @@ export function RoutinesList() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    const refetch = () => {
+      getDashboardRoutines().then(setRoutines);
+    };
+    window.addEventListener("pulse:routine-saved", refetch);
+    return () => window.removeEventListener("pulse:routine-saved", refetch);
+  }, []);
+
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
