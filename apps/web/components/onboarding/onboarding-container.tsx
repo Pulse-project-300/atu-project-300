@@ -48,9 +48,27 @@ export function OnboardingContainer() {
     }
   };
 
+  const handleSkip = async () => {
+    setIsGenerating(true);
+    setStatus("Saving profile...");
+    try {
+      const saveResult = await saveOnboardingProfile(data);
+      if (saveResult.error) {
+        setStatus(`Error saving profile: ${saveResult.error}`);
+        return;
+      }
+      router.push("/routines");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      setStatus("Error: " + (error as Error).message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleNext = async () => {
     if (currentStep === TOTAL_STEPS) {
-      // Final step - save profile and generate plan
+      // Final step - save profile and generate routine
       setIsGenerating(true);
       setStatus("Saving profile...");
 
@@ -64,8 +82,8 @@ export function OnboardingContainer() {
           return;
         }
 
-        // Step 2: Generate workout plan
-        setStatus("Generating your personalized workout plan...");
+        // Step 2: AI generated workout routine
+        setStatus("Generating your personalized workout routine...");
         const res = await fetch("/api/plans/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -83,10 +101,32 @@ export function OnboardingContainer() {
           }),
         });
 
-        const responseData = await res.json();
-        setStatus("Success! Profile saved and plan generated.\n\n" + JSON.stringify(responseData, null, 2));
+        if (!res.ok) {
+          const errData = await res.json();
+          setStatus(`Error generating routine: ${errData.error || res.statusText}`);
+          return;
+        }
 
-        // Optional: Redirect to dashboard after success
+        const responseData = await res.json();
+
+        // Step 3: Save the generated routine to the database
+        if (responseData.routine) {
+          setStatus("Saving your routine...");
+          const saveRes = await fetch("/api/plans/save-routine", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ routine: responseData.routine }),
+          });
+
+          if (!saveRes.ok) {
+            const saveErr = await saveRes.json();
+            setStatus(`Error saving routine: ${saveErr.error || saveRes.statusText}`);
+            return;
+          }
+        }
+
+        setStatus("Success! Your profile and routine have been created.");
+
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
@@ -128,9 +168,17 @@ export function OnboardingContainer() {
                 Ready to start?
               </h2>
               <p className="text-muted-foreground">
-                Click finish to generate your personalised workout plan
+                Click finish to generate your personalised workout routine
               </p>
             </div>
+            <button
+              type="button"
+              onClick={handleSkip}
+              disabled={isGenerating}
+              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors disabled:opacity-50"
+            >
+              Skip for now — I&apos;ll create my own routines
+            </button>
           </div>
         );
       default:
@@ -156,7 +204,7 @@ export function OnboardingContainer() {
 
         {status && (
           <div className="mt-8 p-4 bg-muted rounded-lg border">
-            <h3 className="text-sm font-semibold mb-2">API Response:</h3>
+            <h3 className="text-sm font-semibold mb-2">Generating...</h3>
             <pre className="text-xs overflow-auto max-h-64 whitespace-pre-wrap">
               {status}
             </pre>

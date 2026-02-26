@@ -3,6 +3,7 @@ import { Dumbbell, Plus } from "lucide-react";
 import Link from "next/link";
 import type { Routine } from "@/lib/types/routines";
 import { RoutineCard } from "@/components/routines/routine-card";
+import { AIAssistantFAB } from "@/components/ai-assistant/ai-assistant-fab";
 import { Button } from "@/components/ui/button";
 
 export default async function RoutinesPage() {
@@ -58,6 +59,8 @@ export default async function RoutinesPage() {
           ))}
         </div>
       )}
+
+      <AIAssistantFAB />
     </div>
   );
 }

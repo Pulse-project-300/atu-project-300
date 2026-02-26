@@ -111,6 +111,32 @@ API: `http://localhost:8000/health`
 
 AI Orchestrator: `http://localhost:8001/health`
 
+
+# Redis Setup for Pulse AI Orchestrator
+Install Redis (Ubuntu/Debian)
+
+`sudo apt update`
+`sudo apt install redis-server`
+
+**Start Redis**
+
+`sudo systemctl start redis`
+
+**Verify it's running**
+
+`redis-cli ping`
+**Expected response**: PONG
+
+**Stop Redis**
+
+`sudo systemctl stop redis`
+
+
+**Notes**
+Redis runs on localhost:6379 by default, no config changes needed, the app connects to this automatically.
+Make sure Redis is running before starting the AI orchestrator service, otherwise the server will fail to start.
+If you ever restart your machine and Redis isn't set to auto-start, you'll need to run `sudo systemctl start redis` again before starting the service.
+
 ### Git commit message types
 
 **feat:** Introducing new features or significant improvements. 
