@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { supabase } from "../clients/supabaseClient.js";
 import { checkAndAwardBadges, updateUserStreak } from "../services/badgeService.js";
-import type { Badge, BadgeWithEarnedStatus, AwardBadgeRequest, AwardBadgeResponse } from "../types/badges";
+import type { Badge, BadgeWithEarnedStatus, AwardBadgeRequest, AwardBadgeResponse } from "../types/badges.js";
 
 const router: Router = Router();
 

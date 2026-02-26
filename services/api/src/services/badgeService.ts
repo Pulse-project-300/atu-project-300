@@ -1,6 +1,6 @@
 import { supabase } from "../clients/supabaseClient.js";
-import type { Badge, UserBadge, BadgeCriteria } from "../types/badges";
-import type { BadgeCheckResult, WorkoutStats } from "../types/badges";
+import type { Badge, UserBadge, BadgeCriteria } from "../types/badges.js";
+import type { BadgeCheckResult, WorkoutStats } from "../types/badges.js";
 
 //badge service, handles all badge evaluation and awarding logic
 /*
