@@ -1,3 +1,5 @@
+import { AIAssistantFAB } from "@/components/ai-assistant/ai-assistant-fab";
+
 export default function ProgressPage() {
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
@@ -13,6 +15,8 @@ export default function ProgressPage() {
           Progress tracking feature coming soon...
         </p>
       </div>
+
+      <AIAssistantFAB />
     </div>
   );
 }

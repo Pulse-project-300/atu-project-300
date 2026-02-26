@@ -5,6 +5,7 @@ import { Dumbbell, Trash2, Play, Loader2 } from "lucide-react";
 import { deleteRoutine } from "@/app/(app)/routines/actions";
 import { useWorkout } from "@/components/workout/workout-provider";
 import type { Routine } from "@/lib/types/routines";
+import { Button } from "@/components/ui/button";
 
 interface RoutineCardProps {
   routine: Routine;
@@ -75,51 +76,54 @@ export function RoutineCard({ routine }: RoutineCardProps) {
         {showConfirm ? (
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Delete?</span>
-            <button
+            <Button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 disabled:opacity-50"
+              variant="destructive"
+              size="sm"
             >
               {isDeleting ? "..." : "Yes"}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setShowConfirm(false)}
               disabled={isDeleting}
-              className="px-3 py-1.5 rounded-lg border text-sm font-medium hover:bg-muted"
+              variant="outline"
+              size="sm"
             >
               No
-            </button>
+            </Button>
           </div>
         ) : (
           <>
-            <button
+            <Button
               onClick={() => setShowConfirm(true)}
-              className="p-2 rounded-lg hover:bg-destructive/5 text-muted-foreground hover:text-destructive transition-colors"
-              title="Delete routine"
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+              aria-label={`Delete ${routine.name}`}
             >
               <Trash2 className="h-4 w-4" />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleStartOrContinueWorkout}
               disabled={isStarting || (hasActiveWorkout && !isThisRoutineActive)}
-              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium hover:bg-primary/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              title={
-                isThisRoutineActive 
-                  ? "Continue this workout" 
-                  : hasActiveWorkout 
-                    ? "Finish your current workout first" 
+              variant="outline"
+              className="border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-bold"
+              aria-label={
+                isThisRoutineActive
+                  ? "Continue this workout"
+                  : hasActiveWorkout
+                    ? "Finish your current workout first"
                     : "Start workout"
               }
             >
               {isStarting ? (
-                <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Play className="h-4 w-4 text-primary" />
+                <Play className="h-4 w-4" />
               )}
-              <span className="text-primary font-bold">
-                {isThisRoutineActive ? "Continue" : hasActiveWorkout ? "In Progress" : "Start"}
-              </span>
-            </button>
+              {isThisRoutineActive ? "Continue" : hasActiveWorkout ? "In Progress" : "Start"}
+            </Button>
           </>
         )}
       </div>

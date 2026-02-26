@@ -5,6 +5,9 @@ dist/
 pnpm-lock.yaml
 .env.local
 
+# Next.js
+.next/
+
 
 # Python
 __pycache__/

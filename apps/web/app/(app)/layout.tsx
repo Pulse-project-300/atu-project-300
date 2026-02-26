@@ -21,12 +21,12 @@ export default async function AppLayout({
 
   return (
     <WorkoutWrapper>
-      <main className="min-h-screen flex flex-col items-center">
+      <main className="min-h-screen flex flex-col items-center overflow-x-hidden">
         <div className="flex-1 w-full flex flex-col items-center">
           <Nav authButton={<AuthButton />} />
 
           {/* Main content - add bottom padding on mobile for the fixed nav */}
-          <div className="flex-1 flex flex-col w-full max-w-5xl p-5 pb-24 md:pb-5">
+          <div className="flex-1 flex flex-col w-full max-w-5xl p-5 pb-20 md:pb-5">
             {children}
           </div>
 

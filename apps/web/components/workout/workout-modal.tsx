@@ -106,7 +106,7 @@ export function WorkoutModal() {
 
   // Expanded View
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in fade-in">
+    <div data-testid="workout-modal" className="fixed inset-0 z-50 bg-background flex flex-col animate-in fade-in">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
         <div className="flex items-center justify-between p-4">
@@ -116,6 +116,7 @@ export function WorkoutModal() {
               size="icon"
               className="rounded-full"
               onClick={minimize}
+              aria-label="Minimize workout"
             >
               <Minimize2 className="h-5 w-5" />
             </Button>
