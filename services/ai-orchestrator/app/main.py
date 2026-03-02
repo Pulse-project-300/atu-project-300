@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
         await init_redis()
         logger.info("Redis connected")
     except Exception as e:
-        logger.warning("Redis unavailable (%s) — rate limiting disabled", e)
+        logger.warning("Redis unavailable — running without cache: %s", e)
     yield
     logger.info("Shutting down — closing Redis pool")
     await close_redis()

@@ -13,6 +13,9 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
+import { ChevronRight, Dumbbell, Clock } from "lucide-react";
+import { getWorkoutDetail, type WorkoutHistoryDetail } from "@/app/(app)/analytics/actions";
+import { PastWorkoutModal } from "@/components/workout/past-workout-modal";
 
 type WorkoutRow = {
   id: string;
@@ -174,46 +177,56 @@ export default function CalendarClient() {
         </button>
       </div>
 
-      {/* MOBILE: Week strip */}
+      {/* MOBILE: Month grid */}
       <div className="rounded-xl border border-border bg-card p-3 md:hidden">
-        <div className="mb-2 flex items-center justify-between">
-          <div className="text-sm font-semibold">{format(selectedDay, "PPP")}</div>
-          <div className="text-xs text-muted-foreground">{tz}</div>
+        <div className="grid grid-cols-7 mb-1">
+          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+            <div
+              key={d}
+              className="px-1 py-1 text-center text-[10px] font-semibold text-muted-foreground"
+            >
+              {d}
+            </div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
-          {weekDays.map((day) => {
-            const key = format(day, "yyyy-MM-dd");
-            const count = countsByDay[key] ?? 0;
-            const isSelected = key === selectedKey;
+        {loadingMonth ? (
+          <div className="p-4 text-sm text-muted-foreground">Loading…</div>
+        ) : (
+          <div className="grid grid-cols-7 gap-1">
+            {monthDays.map((day) => {
+              const inMonth = isSameMonth(day, monthDate);
+              const key = format(day, "yyyy-MM-dd");
+              const count = countsByDay[key] ?? 0;
+              const isSelected = key === selectedKey;
 
-            return (
-              <button
-                key={key}
-                onClick={() => {
-                  setSelectedDay(day);
-                  loadDayWorkouts(day);
-                }}
-                className={[
-                  "flex flex-col items-center justify-center rounded-lg border px-1 py-2 transition-colors",
-                  "border-border hover:bg-muted",
-                  isSelected ? "bg-accent" : "bg-background",
-                ].join(" ")}
-                aria-label={`Select ${format(day, "PPP")}`}
-              >
-                <div className="text-[10px] font-semibold text-muted-foreground">
-                  {format(day, "EEE")}
-                </div>
-                <div className="text-sm font-semibold">{format(day, "d")}</div>
-                <div className="mt-1 h-1.5">
-                  {count > 0 ? (
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-                  ) : null}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setSelectedDay(day);
+                    loadDayWorkouts(day);
+                  }}
+                  className={[
+                    "flex items-center justify-center rounded-full aspect-square transition-colors",
+                    "hover:bg-muted",
+                    isSelected && count > 0
+                      ? "bg-primary text-primary-foreground"
+                      : isSelected
+                        ? "bg-accent"
+                        : count > 0
+                          ? "bg-primary/15 text-primary"
+                          : "",
+                    !inMonth && count === 0 ? "opacity-30" : !inMonth ? "opacity-60" : "",
+                  ].join(" ")}
+                  aria-label={`Select ${format(day, "PPP")}`}
+                >
+                  <span className="text-sm font-semibold">{format(day, "d")}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* DESKTOP: Month grid + Day panel side-by-side */}
@@ -308,61 +321,81 @@ function DayPanel({
   loadingDay: boolean;
   workoutsForDay: WorkoutRow[];
 }) {
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutHistoryDetail | null>(null);
+  const [loadingWorkoutId, setLoadingWorkoutId] = useState<string | null>(null);
+
+  const handleWorkoutClick = async (workoutId: string) => {
+    setLoadingWorkoutId(workoutId);
+    try {
+      const detail = await getWorkoutDetail(workoutId);
+      if (detail) {
+        setSelectedWorkout(detail);
+      }
+    } catch (err) {
+      console.error("Failed to load workout details:", err);
+    } finally {
+      setLoadingWorkoutId(null);
+    }
+  };
+
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <h2 className="text-sm font-semibold">{format(selectedDay, "PPP")}</h2>
+    <>
+      <div className="rounded-xl border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold">{format(selectedDay, "PPP")}</h2>
 
-      <div className="mt-3">
-        {loadingDay && <div className="text-sm text-muted-foreground">Loading workouts…</div>}
+        <div className="mt-3">
+          {loadingDay && <div className="text-sm text-muted-foreground">Loading workouts…</div>}
 
-        {!loadingDay && workoutsForDay.length === 0 && (
-          <div className="text-sm text-muted-foreground">No completed workouts logged.</div>
-        )}
+          {!loadingDay && workoutsForDay.length === 0 && (
+            <div className="text-sm text-muted-foreground">No completed workouts logged.</div>
+          )}
 
-        {!loadingDay && workoutsForDay.length > 0 && (
-          <ul className="space-y-3">
-            {workoutsForDay.map((w) => {
-              const duration =
-                w.duration_seconds && w.duration_seconds > 0
-                  ? formatDuration(w.duration_seconds)
-                  : null;
+          {!loadingDay && workoutsForDay.length > 0 && (
+            <ul className="space-y-2">
+              {workoutsForDay.map((w) => {
+                const duration =
+                  w.duration_seconds && w.duration_seconds > 0
+                    ? formatDuration(w.duration_seconds)
+                    : null;
 
-              return (
-                <li key={w.id} className="rounded-lg border border-border bg-background p-3">
-                  <div className="font-semibold">
-                    {w.name ?? "Workout"}
-                    {w.status ? (
-                      <span className="ml-2 font-normal text-muted-foreground">({w.status})</span>
-                    ) : null}
-                  </div>
+                return (
+                  <li key={w.id}>
+                    <button
+                      onClick={() => handleWorkoutClick(w.id)}
+                      disabled={loadingWorkoutId === w.id}
+                      className="w-full group flex items-center gap-3 rounded-lg border border-border bg-background p-3 text-left transition-colors hover:bg-muted/50 disabled:opacity-70"
+                    >
+                      <div className="rounded-full bg-primary/10 p-2">
+                        <Dumbbell className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold truncate">{w.name ?? "Workout"}</div>
+                        <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <span>{duration ?? "—"}</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
 
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    {w.started_at ? (
-                      <span>Started {format(new Date(w.started_at), "p")}</span>
-                    ) : (
-                      <span>Started —</span>
-                    )}
-                    {" · "}
-                    {w.completed_at ? (
-                      <span>Completed {format(new Date(w.completed_at), "p")}</span>
-                    ) : (
-                      <span>Completed —</span>
-                    )}
-                    {duration ? <span>{" · "}{duration}</span> : null}
-                  </div>
-
-                  {w.notes ? <div className="mt-2 text-sm">{w.notes}</div> : null}
-                </li>
-              );
-            })}
-          </ul>
+        {isSameDay(selectedDay, new Date()) && (
+          <div className="mt-4 text-xs text-muted-foreground">You’re viewing today.</div>
         )}
       </div>
 
-      {isSameDay(selectedDay, new Date()) && (
-        <div className="mt-4 text-xs text-muted-foreground">You’re viewing today.</div>
+      {selectedWorkout && (
+        <PastWorkoutModal
+          workout={selectedWorkout}
+          onClose={() => setSelectedWorkout(null)}
+        />
       )}
-    </div>
+    </>
   );
 }
 

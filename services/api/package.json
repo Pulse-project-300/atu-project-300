@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "DOTENV_CONFIG_PATH=../../.env tsx watch src/index.ts",
+    "dev": "DOTENV_CONFIG_PATH=../../.env.local tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "DOTENV_CONFIG_PATH=../../.env node dist/index.js",
     "typecheck": "tsc --noEmit",
