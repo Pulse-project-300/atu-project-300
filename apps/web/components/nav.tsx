@@ -22,7 +22,6 @@ import { AIAssistantDrawer } from "@/components/ai-assistant/ai-assistant-drawer
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/routines", label: "Routines", icon: Dumbbell },
-  { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/analytics", label: "Analytics", icon: TrendingUp },
   { href: "/achievements", label: "Achieve", icon: Trophy },
 ];
@@ -64,6 +63,9 @@ export function Nav({ authButton }: NavProps) {
           </div>
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
+            <Link href="/calendar" aria-label="Calendar" className="text-muted-foreground hover:text-primary transition-colors">
+              <CalendarDays className="h-5 w-5" />
+            </Link>
             <Link href="/settings" aria-label="Settings" className="text-muted-foreground hover:text-primary transition-colors">
               <Settings className="h-5 w-5" />
             </Link>
@@ -79,6 +81,9 @@ export function Nav({ authButton }: NavProps) {
         </Link>
         <div className="flex items-center gap-3">
           <ThemeSwitcher />
+          <Link href="/calendar" aria-label="Calendar" className="text-muted-foreground hover:text-primary transition-colors">
+            <CalendarDays className="h-5 w-5" />
+          </Link>
           <Link href="/settings" aria-label="Settings" className="text-muted-foreground hover:text-primary transition-colors">
             <Settings className="h-5 w-5" />
           </Link>

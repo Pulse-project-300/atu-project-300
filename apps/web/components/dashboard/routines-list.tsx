@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Play, Dumbbell, Clock } from "lucide-react";
+import { Play, Dumbbell, Clock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import {
   getDashboardRoutines,
   type DashboardRoutine,
 } from "@/app/(app)/dashboard/actions";
+import { useWorkout } from "@/components/workout/workout-provider";
 
 export function RoutinesList() {
   const [routines, setRoutines] = useState<DashboardRoutine[]>([]);
   const [loading, setLoading] = useState(true);
+  const [startingId, setStartingId] = useState<string | null>(null);
+  const { startWorkout, activeWorkout, expand } = useWorkout();
 
   useEffect(() => {
     getDashboardRoutines()
@@ -101,15 +104,32 @@ export function RoutinesList() {
                 </div>
               </div>
 
-              <Link
-                href={`/workout/${routine.id}`}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium shadow-sm transition-all hover:bg-primary/10"
+              <button
+                onClick={async () => {
+                  if (activeWorkout?.routine_id === routine.id) {
+                    expand();
+                    return;
+                  }
+                  if (activeWorkout) return;
+                  setStartingId(routine.id);
+                  try {
+                    await startWorkout(routine.id);
+                  } finally {
+                    setStartingId(null);
+                  }
+                }}
+                disabled={startingId === routine.id || (!!activeWorkout && activeWorkout.routine_id !== routine.id)}
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium shadow-sm transition-all hover:bg-primary/10 disabled:opacity-50"
               >
-                <Play className="h-4 w-4 text-primary" />
+                {startingId === routine.id ? (
+                  <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4 text-primary" />
+                )}
                 <span className="text-primary font-bold">
-                  Start
+                  {activeWorkout?.routine_id === routine.id ? "Continue" : "Start"}
                 </span>
-              </Link>
+              </button>
             </div>
           ))
         )}
