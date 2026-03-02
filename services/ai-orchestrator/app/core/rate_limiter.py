@@ -137,11 +137,16 @@ async def require_rate_limit(request: Request) -> None:
     FastAPI dependency extracts userId from the parsed request body
     and enforces per-minute, per-hour, and per-day sliding-window limits.
     """
+    try:
+        get_redis()  # raises RuntimeError if not initialised
+    except RuntimeError:
+        logger.debug("Redis not available — skipping rate limit check")
+        return
+
     body = await request.json()
     user_id = body.get("userId")
 
     if not user_id:
-
         return
 
     await _check_rate_limit(user_id)
